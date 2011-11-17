@@ -1,0 +1,7 @@
+Special credits
+===============
+Mathijs Kleijnen: 
+    Suggesting the name Dyonisos
+Jonge Democraten: 
+    Supporting developement
+
