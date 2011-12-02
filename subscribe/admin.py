@@ -14,7 +14,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ############################################################################### 
 
-from jdideal.subscribe.models import *
+from Dyonisos.subscribe.models import *
 from django.contrib import admin
 from django.http import HttpResponse
 
@@ -94,6 +94,11 @@ class EventAdmin(admin.ModelAdmin):
     #list_filter = ['active', ]
 
 class RegistrationAdmin(admin.ModelAdmin):
+    #def get_form(self, request, obj=None, **kwargs):
+    #    form = super(RegistrationAdmin,self).get_form(self,request, obj,**kwargs)
+    #    form.base_fields['event_option'].queryset =
+    #        form.base_fields['event_option'].queryset.filter(event_option_event = None)#XXX)
+    
     fieldsets = [(None, {'fields': ['first_name', 'last_name', 'email', 'event_option', 'payed']})]
     list_display = ["id", "first_name", "last_name", "payed", "check_link", "event", "event_option"]
     list_filter = ["payed", "event"]
