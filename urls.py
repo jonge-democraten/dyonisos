@@ -5,15 +5,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^jdideal/', include('jdideal.foo.urls')),
-
     # Inschrijf formulier
-    (r'^inschrijven/(?P<slug>[\w-]+)/$', 'jdideal.subscribe.views.register'),
-    #(r'^form/(?P<slug>[\w-]+)/$', 'jdideal.subscribe.views.register'),
+    (r'^inschrijven/(?P<slug>[\w-]+)/$', 'Dyonisos.subscribe.views.register'),
 
-    (r'^check/$', 'jdideal.subscribe.views.check'),
-    (r'^refresh_issuers/$', 'jdideal.subscribe.views.refresh_issuers'),
+    (r'^check/$', 'Dyonisos.subscribe.views.check'),
+    (r'^refresh_issuers/$', 'Dyonisos.subscribe.views.refresh_issuers'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),

@@ -16,15 +16,16 @@
 
 import datetime
 
+from django.utils.translation import ugettext as _
 from django.template import Context, loader
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 
-from jdideal.subscribe.models import *
-from jdideal.subscribe.forms import *
+from Dyonisos.subscribe.models import *
+from Dyonisos.subscribe.forms import *
 
-from jdideal.lib.ideal import *
+from Dyonisos.lib.ideal import *
 
 
 def _safe_string(s, max_len=32):
@@ -35,7 +36,7 @@ def register(request, slug):
     event = get_object_or_404(Event, slug=slug)
     now = datetime.datetime.now()
     if event.start_registration > now or event.end_registration < now:
-        return HttpResponse("Inschrijving gesloten.")
+        return HttpResponse(_("Inschrijving gesloten."))
     #SubscribeForm = SubscribeFormBuilder(event)
     if request.method == "POST":
         form = SubscribeForm(event, request.POST)
@@ -46,7 +47,7 @@ def register(request, slug):
                 subscription.payed = True
                 subscription.send_confirmation_email()
                 subscription.save()
-                return HttpResponse("Dank voor uw inschrijving")
+                return HttpResponse(_("Dank voor uw inschrijving"))
             # You need to pay
             oIDC = iDEALConnector()
 
@@ -58,7 +59,7 @@ def register(request, slug):
                 entranceCode=subscription.gen_subscription_id()
             )
             if type(req) != AcquirerTransactionResponse:
-                return HttpResponse("Technische fout, probeer later opnieuw.")
+                return HttpResponse(_("Technische fout, probeer later opnieuw."))
             sUrl = req.getIssuerAuthenticationURL()
             return HttpResponseRedirect(sUrl)
     else:
@@ -76,17 +77,14 @@ def refresh_issuers(request):
     if oldest_issuer:
         if (oldest_issuer[0].update - datetime.datetime.now()).days <= 0:
             # Don't update more than once a day.
-            age = (oldest_issuer[0].update - datetime.datetime.now()).seconds
-            hours = int(age/3600)
-            minutes =  int(age/60)%60
-            return HttpResponse("Don't refresh more that once a day. Try again in %d:%d." % (hours, minutes))
+            return HttpResponse(_("Don't refresh more that once a day. Try again later."))
     # Get the new Ideal issuer list
     oIDC = iDEALConnector()
     issuers = oIDC.GetIssuerList()
     if issuers.IsResponseError():
         # An error occured
         print "Error getting Ideal issuers: %s - %s" % (issuers.getErrorCode(), issuers.getErrorMessage())
-        return HttpResponse("An error occured while getting the issuers list.")
+        return HttpResponse(_("An error occured while getting the issuers list."))
     dIssuers = issuers.getIssuerFullList()
     for sIS, oIS in dIssuers.items():
         issuer = IdealIssuer.objects.filter(issuer_id=oIS.getIssuerID())
@@ -100,7 +98,7 @@ def refresh_issuers(request):
         issuer.save()
     # Now delete older issuers
     IdealIssuer.objects.filter(update__lte=datetime.datetime.now()+datetime.timedelta(-1,0,0)).delete()
-    return HttpResponse("Update succesfull.")
+    return HttpResponse(_("Update succesfull."))
 
 
 def check(request):
@@ -108,7 +106,7 @@ def check(request):
     try:
         ec = int(request.GET['ec'].split("x")[0])
     except:
-        return HttpResponse("iDEAL error(Technische fout): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren.")
+        return HttpResponse(_("iDEAL error(Technische fout): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
     oIDC = iDEALConnector()
     req_status = oIDC.RequestTransactionStatus(trxid)
@@ -117,18 +115,18 @@ def check(request):
         try:
             subscription = Registration.objects.get(id=ec)
         except:
-            return HttpResponse("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren.")
+            return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
         if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
 	    subscription.payed = True
             subscription.send_confirmation_email()
             subscription.save()
-            return HttpResponse("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd.")
+            return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
         elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
-            return HttpResponse("Je betaling is geannuleerd.")
+            return HttpResponse(_("Je betaling is geannuleerd."))
         else:
-            return HttpResponse("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren.")
+            return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
     else:
-        return HttpResponse("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren.")
+        return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
 

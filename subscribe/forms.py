@@ -17,7 +17,7 @@
 
 from django import forms
 from django.utils.safestring import mark_safe
-from jdideal.subscribe.models import *
+from Dyonisos.subscribe.models import *
 
 class SubscribeForm(forms.Form):
     def __init__(self, event, *args, **kwargs):
