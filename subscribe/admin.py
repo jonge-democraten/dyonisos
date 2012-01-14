@@ -102,7 +102,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('registration_date', 'first_name', 'last_name', 
-                        'email', 'event_option', 'payed'),
+                        'email', 'event', 'event_option', 'payed'),
             }),
     )
     list_display = ["id", "registration_date", "first_name", "last_name", "payed", "check_link", "event", "event_option"]
