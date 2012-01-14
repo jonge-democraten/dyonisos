@@ -98,9 +98,14 @@ class RegistrationAdmin(admin.ModelAdmin):
     #    form = super(RegistrationAdmin,self).get_form(self,request, obj,**kwargs)
     #    form.base_fields['event_option'].queryset =
     #        form.base_fields['event_option'].queryset.filter(event_option_event = None)#XXX)
-    
-    fieldsets = [(None, {'fields': ['first_name', 'last_name', 'email', 'event_option', 'payed']})]
-    list_display = ["id", "first_name", "last_name", "payed", "check_link", "event", "event_option"]
+    readonly_fields = ('registration_date', ) 
+    fieldsets = (
+        (None, {
+            'fields': ('registration_date', 'first_name', 'last_name', 
+                        'email', 'event_option', 'payed'),
+            }),
+    )
+    list_display = ["id", "registration_date", "first_name", "last_name", "payed", "check_link", "event", "event_option"]
     list_filter = ["payed", "event"]
 
 #admin.site.register(EventQuestion)

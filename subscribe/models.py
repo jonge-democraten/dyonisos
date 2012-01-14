@@ -140,7 +140,7 @@ class Answer(models.Model):
             return self.bool_field
 
 class Registration(models.Model):
-    timestamp = models.DateTimeField(auto_now=True)
+    registration_date = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
