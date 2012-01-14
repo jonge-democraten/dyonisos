@@ -18,6 +18,8 @@ from django.db import models
 from django.template import Context, Template
 from django.utils.encoding import smart_str, smart_unicode
 
+from Dyonisos.lib.ideal import *
+
 import datetime
 import smtplib
 from email.mime.text import MIMEText
@@ -148,14 +150,17 @@ class Registration(models.Model):
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
     payed = models.BooleanField(default=False)
+    trxid = models.CharField(max_length=128, default=None, blank=True)
+    check_ttl = models.IntegerField(default=5)
+    
 
     def __unicode__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
 
     def gen_subscription_id(self):
-	num_id = str(self.id)
-	safe = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-	return num_id+"x"+filter(lambda c: c in safe, self.event_option.name)[:15-len(num_id)]
+        num_id = str(self.id)
+        safe = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        return num_id+"x"+filter(lambda c: c in safe, self.event_option.name)[:15-len(num_id)]
 
 
     def send_confirmation_email(self):
@@ -175,6 +180,37 @@ class Registration(models.Model):
         s = smtplib.SMTP("localhost:587")
         s.sendmail(self.event.contact_email, [self.email], msg.as_string().encode('ascii','replace'))
         s.quit()
+
+    def check_payment_status(self):
+        if self.payed:
+            return True # Has payed
+        if self.check_ttl <= 0:
+            return False # Give up and don't check again.
+        if not self.trxid:
+            return None # trxid not set, can't check
+        else:
+            # check payment with ideal provider
+            oIDC = iDEALConnector()
+            req_status = oIDC.RequestTransactionStatus(self.trxid)
+            if not req_status.IsResponseError():
+                if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
+                    self.payed = True
+                    self.send_confirmation_email()
+                    self.save()
+                    return True
+                elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
+                    self.check_ttl = 0 # Don't check again
+                    self.save()
+                    return False
+                else:
+                    self.check_ttl -= 1 # Check later
+                    self.save()
+                    return None
+            else:
+                self.check_ttl -= 1
+                self.save()
+                return None                
+                        
 
     def check_link(self):
         return u'<a href="/check/?ec=%dxcheck">Check</a>' % (self.id)
