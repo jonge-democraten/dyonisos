@@ -150,7 +150,7 @@ class Registration(models.Model):
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
     payed = models.BooleanField(default=False)
-    trxid = models.CharField(max_length=128, default=None, blank=True)
+    trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=5)
     
 
