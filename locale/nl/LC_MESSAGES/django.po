@@ -1,17 +1,18 @@
-# Dyonisos Dutch translation.
-# Copyright (C) 2011 Floor Terra <floort@gmail.com>
+# Dyonisos Dutch translations.
+# Copyright (C) 2012
 # This file is distributed under the same license as the Dyonisos package.
+# Floor Terra <floort@gmail.com>, 2012.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-08 18:57+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2012-01-16 15:53+0100\n"
+"PO-Revision-Date: 2012-01-16 HO:MI+ZONE\n"
+"Last-Translator: Floor Terra <floort@gmail.com>\n"
+"Language-Team: Floor Terra <floort@gmail.com>\n"
+"Language: Dutch\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
