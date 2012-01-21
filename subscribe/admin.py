@@ -54,7 +54,6 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 5, reg.event_option.name)
             s.write(row, 6, reg.id)
             for ans in reg.answers.all():
-		print row, q_to_col[ans.question.id],  ans.get_answer()
                 s.write(row, q_to_col[ans.question.id], ans.get_answer())
             row += 1
     out = StringIO.StringIO()
