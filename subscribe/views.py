@@ -43,6 +43,9 @@ def register(request, slug):
         if form.is_valid():
             # Store the data
             subscription = fill_subscription(form, event)
+            if not subscription:
+                # Error Filling subscription
+                return HttpResponse(_("Error in saving form."))
             if subscription.event_option.price <= 0:
                 subscription.payed = True
                 subscription.send_confirmation_email()

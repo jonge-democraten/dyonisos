@@ -66,7 +66,7 @@ export_events.short_description = "Export event subscriptions to excel."
 class EventOptionInline(admin.TabularInline):
     model = EventOption
     extra = 1
-    fields = ['name', 'price']
+    fields = ['name', 'price', 'active']
 
 class EventQuestionInline(admin.TabularInline):
     model = EventQuestion

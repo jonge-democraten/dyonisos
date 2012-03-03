@@ -49,7 +49,7 @@ class SubscribeForm(forms.Form):
                                                        required=question.required)
         # Closing fixed options
         self.fields["option"] = forms.ModelChoiceField(
-                                        queryset=event.eventoption_set.all(),
+                                        queryset=event.eventoption_set.filter(active=True),
                                         label="Optie")
         # Only show bank choice if at least one of the options costs money
         if not event.all_free():
@@ -62,6 +62,7 @@ def fill_subscription(form, event):
     reg.last_name = form.cleaned_data["last_name"]
     reg.email = form.cleaned_data["email"]
     reg.event_option = form.cleaned_data["option"]
+    if not reg.event_option.action: return False # Error: event_option is inactive. 
     reg.save()
     for question in event.eventquestion_set.all():
         ans = Answer(question=question)

@@ -92,6 +92,7 @@ class EventOption(models.Model):
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten")
     event = models.ForeignKey(Event)
+    active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return u"%s - \u20AC %.2f" % (self.name, float(self.price)/100)
