@@ -62,7 +62,7 @@ def fill_subscription(form, event):
     reg.last_name = form.cleaned_data["last_name"]
     reg.email = form.cleaned_data["email"]
     reg.event_option = form.cleaned_data["option"]
-    if not reg.event_option.action: return False # Error: event_option is inactive. 
+    if not reg.event_option.active: return False # Error: event_option is inactive. 
     reg.save()
     for question in event.eventquestion_set.all():
         ans = Answer(question=question)
