@@ -3,3 +3,5 @@ db.sqlite
 *.log
 *.swp
 *~
+settings.py
+subscribe/migrations
