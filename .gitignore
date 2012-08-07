@@ -5,3 +5,4 @@ db.sqlite
 *~
 settings.py
 subscribe/migrations
+lib/includes/
