@@ -51,6 +51,7 @@ def register(request, slug):
                 subscription.send_confirmation_email()
                 subscription.save()
                 return HttpResponse(_("Dank voor uw inschrijving"))
+            
             # You need to pay
             oIDC = iDEALConnector()
 
@@ -59,11 +60,18 @@ def register(request, slug):
                 purchaseId=subscription.gen_subscription_id(),
                 amount=subscription.event_option.price,
                 description=_safe_string(subscription.event_option.__unicode__()),
-                entranceCode=subscription.gen_subscription_id()
-            )
+                entranceCode=subscription.gen_subscription_id() )
+            
             if type(req) != AcquirerTransactionResponse:
                 return HttpResponse(_("Technische fout, probeer later opnieuw."))
+            
             sUrl = req.getIssuerAuthenticationURL()
+            
+            # store the transaction ID, can later be used to check the status of the transaction
+            transactionId = req.getTransactionID()
+            subscription.trxid = transactionId
+            subscription.save()
+            
             return HttpResponseRedirect(sUrl)
     else:
         form = SubscribeForm(event)
