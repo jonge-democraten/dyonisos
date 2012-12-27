@@ -213,7 +213,7 @@ class Registration(models.Model):
                     self.save()
                     return None
             else:
-                print 'models::check_payment_status() - ERROR RequestTransactionStatus: ' + req_status.getErrorMessage() + ' , for registration id: ' + self.
+                print 'models::check_payment_status() - ERROR RequestTransactionStatus: ' + req_status.getErrorMessage()
                 self.check_ttl -= 1
                 self.save()
                 return None                
