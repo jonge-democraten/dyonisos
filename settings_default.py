@@ -1,5 +1,7 @@
 # Django settings for Dyonisos project.
 
+INSTALL_DIR = '' # the Dyonisos root directory, for example: '/home/bart/dev/Dyonisos/'
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -52,6 +54,8 @@ MEDIA_ROOT = ''
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = 'https://static.example.com/'
 
+STATIC_URL = INSTALL_DIR + 'staticfiles/'
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -76,13 +80,13 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
 )
 
-ROOT_URLCONF = 'Dyonisos.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/home/floort/devel/Dyonisos/templates/",
+    INSTALL_DIR + 'templates/',
 )
 
 INSTALLED_APPS = (
@@ -91,6 +95,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
