@@ -103,7 +103,7 @@ class EventOption(models.Model):
         return u"%s - \u20AC %.2f" % (self.name, float(self.price)/100)
 
     def price_str(self):
-	return u"\u20AC %.2f" % (float(self.price)/100)
+        return u"\u20AC %.2f" % (float(self.price)/100)
 
 class EventQuestion(models.Model):
     name = models.CharField(max_length=64)
@@ -213,6 +213,7 @@ class Registration(models.Model):
                     self.save()
                     return None
             else:
+                print 'models::check_payment_status() - ERROR RequestTransactionStatus: ' + req_status.getErrorMessage() + ' , for registration id: ' + self.
                 self.check_ttl -= 1
                 self.save()
                 return None                
