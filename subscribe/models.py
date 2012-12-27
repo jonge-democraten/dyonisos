@@ -18,7 +18,7 @@ from django.db import models
 from django.template import Context, Template
 from django.utils.encoding import smart_str, smart_unicode
 
-from Dyonisos.lib.ideal import *
+from lib.ideal import *
 
 import datetime
 import smtplib

@@ -14,7 +14,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ############################################################################### 
 
-from Dyonisos.subscribe.models import *
+from subscribe.models import *
 from django.contrib import admin
 from django.http import HttpResponse
 

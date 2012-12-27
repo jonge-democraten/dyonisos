@@ -6,10 +6,10 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Inschrijf formulier
-    (r'^inschrijven/(?P<slug>[\w-]+)/$', 'Dyonisos.subscribe.views.register'),
+    (r'^inschrijven/(?P<slug>[\w-]+)/$', 'subscribe.views.register'),
 
-    (r'^check/$', 'Dyonisos.subscribe.views.check'),
-    (r'^refresh_issuers/$', 'Dyonisos.subscribe.views.refresh_issuers'),
+    (r'^check/$', 'subscribe.views.check'),
+    (r'^refresh_issuers/$', 'subscribe.views.refresh_issuers'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
