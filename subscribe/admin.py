@@ -89,7 +89,7 @@ class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'end_registration'
     inlines = [EventOptionInline, EventQuestionInline]
     actions = [export_events,] #XXX: export
-    list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration']
+    list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration', 'update_all_event_transaction_statuses']
     #list_filter = ['active', ]
 
 class RegistrationAdmin(admin.ModelAdmin):

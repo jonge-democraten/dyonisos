@@ -140,7 +140,15 @@ def check(request):
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
-
+def update_all_event_transaction_statuses(request):
+    print 'views::update_all_event_transaction_statuses()'
+    eventId = request.GET['eventId']
+    
+    for r in Registration.objects.filter(event=eventId).filter(payed=False).filter(trxid__isnull=False).filter(check_ttl__gt=0):
+        print 'view::update_all_event_transaction_statuses() - registration id: ' + str(r.id)
+        r.check_payment_status()
+        
+    return HttpResponse(_("All event transactions/registrations statusses updated"))
 
 
 

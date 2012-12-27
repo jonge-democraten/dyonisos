@@ -10,6 +10,7 @@ urlpatterns = patterns('',
 
     (r'^check/$', 'subscribe.views.check'),
     (r'^refresh_issuers/$', 'subscribe.views.refresh_issuers'),
+    (r'^updateEventTransactionStatuses/$', 'subscribe.views.update_all_event_transaction_statuses'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
