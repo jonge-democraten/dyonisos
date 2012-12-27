@@ -93,9 +93,9 @@ def refresh_issuers(request):
     oIDC = iDEALConnector()
     issuers = oIDC.GetIssuerList()
     if issuers.IsResponseError():
-        # An error occured
+        # An error occurred
         print "Error getting Ideal issuers: %s - %s" % (issuers.getErrorCode(), issuers.getErrorMessage())
-        return HttpResponse(_("An error occured while getting the issuers list."))
+        return HttpResponse(_("An error occurred while getting the issuers list."))
     dIssuers = issuers.getIssuerFullList()
     for sIS, oIS in dIssuers.items():
         issuer = IdealIssuer.objects.filter(issuer_id=oIS.getIssuerID())
@@ -109,7 +109,7 @@ def refresh_issuers(request):
         issuer.save()
     # Now delete older issuers
     IdealIssuer.objects.filter(update__lte=datetime.datetime.now()+datetime.timedelta(-1,0,0)).delete()
-    return HttpResponse(_("Update succesfull."))
+    return HttpResponse(_("Update successful."))
 
 
 def check(request):
