@@ -22,10 +22,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 
-from Dyonisos.subscribe.models import *
-from Dyonisos.subscribe.forms import *
+from subscribe.models import *
+from subscribe.forms import *
 
-from Dyonisos.lib.ideal import *
+from lib.ideal import *
 
 
 def _safe_string(s, max_len=32):
