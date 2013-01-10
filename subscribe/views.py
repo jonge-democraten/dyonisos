@@ -140,6 +140,32 @@ def check(request):
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
+def update_transaction_status(request):
+    ec = request.GET['ec']
+    subscription = Registration.objects.get(id=ec)
+    trxid = subscription.trxid
+
+    oIDC = iDEALConnector()
+    print 'views::update_transaction_status() RequestTransactionStatus(): ' + trxid
+    req_status = oIDC.RequestTransactionStatus(trxid)
+    
+    if not req_status.IsResponseError():
+        print 'views::update_transaction_status() : ' + str(req_status.getStatus())
+        if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
+            subscription.payed = True
+            subscription.save()
+#            subscription.send_confirmation_email()
+            return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
+        elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
+            return HttpResponse(_("Betaling is geannuleerd."))
+        elif req_status.getStatus() == IDEAL_TX_STATUS_EXPIRED:
+            return HttpResponse(_("Niet betaald. De transactie sessie is verlopen. Via deze transactie kan niet meer betaald worden."))
+        elif req_status.getStatus() == IDEAL_TX_STATUS_OPEN:
+            return HttpResponse(_("Nog niet betaald, maar de betaalsessie is nog niet verlopen."))
+        else:
+            return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+
+
 def update_all_event_transaction_statuses(request):
     print 'views::update_all_event_transaction_statuses()'
     eventId = request.GET['eventId']
