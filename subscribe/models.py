@@ -216,15 +216,10 @@ class Registration(models.Model):
                 self.check_ttl -= 1
                 self.save()
                 return None                
-                        
-
-    def check_link(self):
-        return u'<a href="/check/?ec=%dxcheck">Check</a>' % (self.id)
     
     def update_transaction_status(self):
         return u'<a href="/updateTransactionStatus/?ec=%d">Update Transaction Status</a>' % (self.id)
     
-    check_link.allow_tags = True
     update_transaction_status.allow_tags = True
 
 

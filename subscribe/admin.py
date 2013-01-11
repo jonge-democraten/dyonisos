@@ -104,7 +104,7 @@ class RegistrationAdmin(admin.ModelAdmin):
                         'email', 'event', 'event_option', 'payed', 'trxid', 'check_ttl'),
             }),
     )
-    list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", 'check_ttl', "update_transaction_status", "check_link", "event_option"]
+    list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", 'check_ttl', "update_transaction_status", "event_option"]
     list_filter = ["payed", "event"]
 
 #admin.site.register(EventQuestion)
