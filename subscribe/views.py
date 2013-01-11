@@ -163,7 +163,7 @@ def update_transaction_status(request):
         elif req_status.getStatus() == IDEAL_TX_STATUS_OPEN:
             return HttpResponse(_("Nog niet betaald, maar de betaalsessie is nog niet verlopen."))
     else:
-        return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+        return HttpResponse(_("Er was een probleem met de iDeal verbinding om de transactie status op te vragen. ERROR: " + req_status.getErrorMessage()))
 
 
 def update_all_event_transaction_statuses(request):
