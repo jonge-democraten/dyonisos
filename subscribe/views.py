@@ -110,7 +110,7 @@ def refresh_issuers(request):
     IdealIssuer.objects.filter(update__lte=datetime.datetime.now()+datetime.timedelta(-1,0,0)).delete()
     return HttpResponse(_("Update successful."))
 
-
+# called when the user returns from iDeal, is set as MERCHANTRETURNURL.
 def check(request):
     trxid = request.GET['trxid']
     try:
@@ -139,6 +139,7 @@ def check(request):
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
+# update the transaction status from the admin view
 def update_transaction_status(request):
     ec = request.GET['ec']
     subscription = Registration.objects.get(id=ec)
@@ -153,7 +154,7 @@ def update_transaction_status(request):
         if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
             subscription.payed = True
             subscription.save()
-#            subscription.send_confirmation_email()
+            subscription.send_confirmation_email()
             return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
         elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
             return HttpResponse(_("Betaling is geannuleerd."))
@@ -161,8 +162,8 @@ def update_transaction_status(request):
             return HttpResponse(_("Niet betaald. De transactie sessie is verlopen. Via deze transactie kan niet meer betaald worden."))
         elif req_status.getStatus() == IDEAL_TX_STATUS_OPEN:
             return HttpResponse(_("Nog niet betaald, maar de betaalsessie is nog niet verlopen."))
-        else:
-            return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+    else:
+        return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
 def update_all_event_transaction_statuses(request):
