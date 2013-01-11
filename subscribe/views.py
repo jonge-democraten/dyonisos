@@ -17,13 +17,12 @@
 import datetime
 
 from django.utils.translation import ugettext as _
-from django.template import Context, loader
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 
-from subscribe.models import *
-from subscribe.forms import *
+from subscribe.models import Event
+from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
 
 from lib.ideal import *
 
@@ -146,7 +145,7 @@ def update_transaction_status(request):
     trxid = subscription.trxid
 
     oIDC = iDEALConnector()
-    print 'views::update_transaction_status() RequestTransactionStatus(): ' + trxid
+    
     req_status = oIDC.RequestTransactionStatus(trxid)
     
     if not req_status.IsResponseError():

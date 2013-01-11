@@ -16,8 +16,8 @@
 
 
 from django import forms
-from django.utils.safestring import mark_safe
-from subscribe.models import *
+
+from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
 
 class SubscribeForm(forms.Form):
     def __init__(self, event, *args, **kwargs):
