@@ -20,6 +20,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
+from django.contrib.auth.decorators import login_required
 
 from subscribe.models import Event
 from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
@@ -140,6 +141,7 @@ def check(request):
 
 
 # update the transaction status from the admin view
+@login_required
 def update_transaction_status(request):
     ec = request.GET['ec']
     subscription = Registration.objects.get(id=ec)
@@ -165,7 +167,7 @@ def update_transaction_status(request):
     else:
         return HttpResponse(_("Er was een probleem met de iDeal verbinding om de transactie status op te vragen. ERROR: " + req_status.getErrorMessage()))
 
-
+@login_required
 def update_all_event_transaction_statuses(request):
     print 'views::update_all_event_transaction_statuses()'
     eventId = request.GET['eventId']
