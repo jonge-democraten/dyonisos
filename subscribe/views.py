@@ -173,7 +173,7 @@ def update_all_event_transaction_statuses(request):
         print 'view::update_all_event_transaction_statuses() - registration id: ' + str(r.id)
         r.check_payment_status()
         
-    return HttpResponse(_("All event transactions/registrations statusses updated"))
+    return HttpResponse(_("All event transactions/registrations statuses updated"))
 
 
 
