@@ -159,6 +159,10 @@ class Answer(models.Model):
             return self.bool_field
 
 
+class PaymentCheckDate(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
+
+    
 class Registration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=64)
@@ -170,6 +174,7 @@ class Registration(models.Model):
     payed = models.BooleanField(default=False)
     trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=5)
+    payment_check_dates = models.ManyToManyField(PaymentCheckDate)
     
     def __unicode__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
@@ -208,6 +213,7 @@ class Registration(models.Model):
             # check payment with ideal provider
             oIDC = iDEALConnector()
             req_status = oIDC.RequestTransactionStatus(self.trxid)
+            self.add_payment_check_date()
             if not req_status.IsResponseError():
                 if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
                     self.payed = True
@@ -232,6 +238,14 @@ class Registration(models.Model):
         return u'<a href="/updateTransactionStatus/?ec=%d">Update Transaction Status</a>' % (self.id)
     
     update_transaction_status.allow_tags = True
+
+
+    def add_payment_check_date(self):
+        now = datetime.datetime.now()
+        checkDate = PaymentCheckDate(date=now)
+        checkDate.save()
+        self.payment_check_dates.add(checkDate)
+        self.save()
 
 
 class IdealIssuer(models.Model):
