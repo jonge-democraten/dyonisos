@@ -92,6 +92,7 @@ class Event(models.Model):
             
     update_all_event_transaction_statuses.allow_tags = True        
 
+
 class EventOption(models.Model):
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten")
@@ -103,6 +104,12 @@ class EventOption(models.Model):
 
     def price_str(self):
         return u"\u20AC %.2f" % (float(self.price)/100)
+    
+    def delete_event(self):
+        return u'<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
+    
+    delete_event.allow_tags = True
+
 
 class EventQuestion(models.Model):
     name = models.CharField(max_length=64)
@@ -146,6 +153,7 @@ class Answer(models.Model):
         elif self.question.question_type == "BOOL":
             return self.bool_field
 
+
 class Registration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=64)
@@ -158,7 +166,6 @@ class Registration(models.Model):
     trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=5)
     
-
     def __unicode__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
 

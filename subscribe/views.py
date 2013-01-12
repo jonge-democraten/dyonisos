@@ -22,7 +22,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 
-from subscribe.models import Event
+from subscribe.models import Event, EventOption
 from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
 
 from lib.ideal import *
@@ -178,6 +178,20 @@ def update_all_event_transaction_statuses(request):
         
     return HttpResponse(_("All event transactions/registrations statuses updated"))
 
+@login_required
+def delete_event_option(request):
+    optionId = request.GET['optionId']
+    
+    usedInNRegistrations = Registration.objects.filter(event_option=optionId).count()
+    
+    if (usedInNRegistrations != 0):
+        return HttpResponse(_("Dit event option kan niet verwijderd worden omdat deze al gebruikt wordt in " + str(usedInNRegistrations) +
+                              " aanmeldingen. <br /> Verwijdering van dit event option zou deze aanmeldingen ongeldig maken en is daarom niet mogelijk."))
+    else:
+        eventOption = EventOption.objects.get(pk=optionId)
+        eventOption.delete()
+        
+        return HttpResponse(_("Event option werd nog niet gebruikt in een aanmelding en kon daarom succesvol verwijderd worden."))
 
 
 
