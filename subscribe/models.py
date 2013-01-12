@@ -105,10 +105,10 @@ class EventOption(models.Model):
     def price_str(self):
         return u"\u20AC %.2f" % (float(self.price)/100)
     
-    def delete_event(self):
+    def delete_event_option(self):
         return u'<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
     
-    delete_event.allow_tags = True
+    delete_event_option.allow_tags = True
 
 
 class EventQuestion(models.Model):
@@ -178,7 +178,6 @@ class Registration(models.Model):
         num_id = str(self.id)
         safe = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
         return num_id+"x"+filter(lambda c: c in safe, self.event_option.name)[:15-len(num_id)]
-
 
     def send_confirmation_email(self):
         t = Template(self.event.email_template)
