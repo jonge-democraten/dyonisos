@@ -21,6 +21,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
+from django.db.transaction import commit_on_success
 
 from subscribe.models import Event, EventOption, EventQuestion
 from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
@@ -168,6 +169,7 @@ def update_transaction_status(request):
         return HttpResponse(_("Er was een probleem met de iDeal verbinding om de transactie status op te vragen. ERROR: " + req_status.getErrorMessage()))
 
 @login_required
+@commit_on_success # combines all database transactions and commits them on success
 def update_all_event_transaction_statuses(request):
     print 'views::update_all_event_transaction_statuses()'
     eventId = request.GET['eventId']

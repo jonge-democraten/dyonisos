@@ -1,10 +1,12 @@
 from django.core.management.base import BaseCommand
+from django.db.transaction import commit_on_success
 
 from subscribe.models import Registration
 import datetime
 
 class Command(BaseCommand):
     
+    @commit_on_success
     def handle(self, *args, **options):
         now = datetime.datetime.now()
         days = 7
