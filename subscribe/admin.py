@@ -73,7 +73,9 @@ class EventOptionInline(admin.TabularInline):
 class EventQuestionInline(admin.TabularInline):
     model = EventQuestion
     extra = 1
-    fields = ['name', 'question_type', 'help', 'required']
+    fields = ['name', 'question_type', 'help', 'required', 'delete_event_question']
+    readonly_fields = ['delete_event_question',]
+    can_delete = False
 
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [

@@ -22,7 +22,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 
-from subscribe.models import Event, EventOption
+from subscribe.models import Event, EventOption, EventQuestion
 from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
 
 from lib.ideal import *
@@ -192,7 +192,19 @@ def delete_event_option(request):
         eventOption.delete()
         
         return HttpResponse(_("Event option werd nog niet gebruikt in een aanmelding en kon daarom succesvol verwijderd worden."))
-
-
+    
+@login_required
+def delete_event_question(request):
+    questionId = request.GET['questionId']
+    warning = int(request.GET['warning'])
+    
+    if warning == 0:
+        eventQuestion = EventQuestion.objects.get(pk=questionId)
+        eventQuestion.delete()
+        return HttpResponse(_(u'Vraag verwijderd. <br /> <a href="/admin/">Terug naar admin.</a>'))
+    else:
+        return HttpResponse(_("""Weet je zeker dat je deze vraag wilt verwijderen? <br /> 
+                                 <a href="/deleteEventQuestion/?questionId=%d&warning=%d">Ja</a> 
+                                 <a href="/admin/">Nee</a>""" % (int(questionId), 0)))
 
 
