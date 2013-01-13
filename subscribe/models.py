@@ -59,7 +59,9 @@ class MultiChoiceAnswer(models.Model):
     
     def __unicode__(self):
         return self.name
-
+    
+    class Meta:
+        ordering = ['name']
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
@@ -279,4 +281,6 @@ class IdealIssuer(models.Model):
     def safe_id(self):
         return "%04d" % (self.issuer_id)
 
+    class Meta:
+        ordering = ['name']
 
