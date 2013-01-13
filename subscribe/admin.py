@@ -28,7 +28,6 @@ def export_events(eventadmin, request, queryset):
     for event in queryset:
         # Put each event in it's own sheet
         s = wb.add_sheet(event.name)
-        registrations = Registration.objects.filter(event=event)
         # Write header
         s.write(0,0,"Voornaam")
         s.write(0,1,"Achternaam")
@@ -43,6 +42,11 @@ def export_events(eventadmin, request, queryset):
             q_to_col[question.id] = i
             s.write(0,i,question.name)
             i += 1
+        mq_to_col = {}
+        for multiQuestion in event.multi_choice_questions.all():
+            mq_to_col[multiQuestion.id] = i
+            s.write(0,i,multiQuestion.name)
+            i += 1
         # Write the data
         row = 1
         for reg in event.registration_set.all():
@@ -53,15 +57,23 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 4, float(reg.event_option.price)/100)
             s.write(row, 5, reg.event_option.name)
             s.write(row, 6, reg.id)
+            
             for ans in reg.answers.all():
                 s.write(row, q_to_col[ans.question.id], ans.get_answer())
+            
+            for multiAns in reg.multi_choice_answers.all():
+                s.write(row, mq_to_col[multiAns.question.id], multiAns.name)
+                
             row += 1
+            
     out = StringIO.StringIO()
     wb.save(out)
     response = HttpResponse(out.getvalue(), mimetype="application/excel")
     response['Content-Disposition'] = 'attachment; filename=events.xls'
     return response
+
 export_events.short_description = "Export event subscriptions to excel."
+
 
 class EventOptionInline(admin.TabularInline):
     model = EventOption
@@ -70,6 +82,7 @@ class EventOptionInline(admin.TabularInline):
     readonly_fields = ['delete_event_option',]
     can_delete = False
 
+
 class EventQuestionInline(admin.TabularInline):
     model = EventQuestion
     extra = 1
@@ -77,24 +90,25 @@ class EventQuestionInline(admin.TabularInline):
     readonly_fields = ['delete_event_question',]
     can_delete = False
 
+
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {
+        ("Event", {
             'fields': [
                 ('name', 'slug'),
                 ('start_registration', 'end_registration'),
                 'description'
             ]}),
-        ("Email", {
-            "fields": ["contact_email", "email_template"]
-        }),
+        ("Email", { "fields": ["contact_email", "email_template"]}),
+        ("Multiple choice questions", {'fields': ['multi_choice_questions']}),
     ]
     prepopulated_fields = {'slug': ('name',)}
     date_hierarchy = 'end_registration'
-    inlines = [EventOptionInline, EventQuestionInline]
+    inlines = [EventQuestionInline, EventOptionInline]
     actions = [export_events,] #XXX: export
     list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration', 'update_all_event_transaction_statuses']
     #list_filter = ['active', ]
+    
 
 class RegistrationAdmin(admin.ModelAdmin):
     #def get_form(self, request, obj=None, **kwargs):
@@ -111,6 +125,21 @@ class RegistrationAdmin(admin.ModelAdmin):
     list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", 'check_ttl', "update_transaction_status", "event_option"]
     list_filter = ["payed", "event"]
 
+
+class MultiChoiceAnswerInline(admin.TabularInline):
+    model = MultiChoiceAnswer
+    extra = 1
+    fields = ['name', 'question',]
+
+
+class MultiChoiceQuestionAdmin(admin.ModelAdmin):
+    model = MultiChoiceQuestion
+    fields = ['name', 'required',]
+    list_display = ['name', 'required',]
+    inlines = [MultiChoiceAnswerInline]
+    
+    
+admin.site.register(MultiChoiceQuestion, MultiChoiceQuestionAdmin)
 #admin.site.register(EventQuestion)
 admin.site.register(Event, EventAdmin)
 #admin.site.register(EventOption)

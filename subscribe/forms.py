@@ -18,11 +18,12 @@
 from django import forms
 
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
+from subscribe.models import MultiChoiceAnswer
 
 class SubscribeForm(forms.Form):
     def __init__(self, event, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
-        # First the manditory fields
+        # First the mandatory fields
         self.fields["first_name"] = forms.CharField(max_length=64, 
                                         required=True, label="Voornaam")
         self.fields["last_name"] = forms.CharField(max_length=64, 
@@ -47,6 +48,11 @@ class SubscribeForm(forms.Form):
             elif question.question_type == "BOOL":
                 self.fields[name] = forms.BooleanField(label=question.name,
                                                        required=question.required)
+        
+        # The multiple choice questions
+        for choiceQuestion in event.multi_choice_questions.all():
+            self.fields[choiceQuestion.name] = forms.ModelChoiceField(queryset=MultiChoiceAnswer.objects.filter(question=choiceQuestion))
+                
         # Closing fixed options
         self.fields["option"] = forms.ModelChoiceField(
                                         queryset=event.eventoption_set.filter(active=True),
@@ -56,18 +62,25 @@ class SubscribeForm(forms.Form):
             self.fields["issuer"] = forms.ModelChoiceField(
                                 queryset=IdealIssuer.objects.all(), label="Bank")
 
+
 def fill_subscription(form, event):
     reg = Registration(event=event)
     reg.first_name = form.cleaned_data["first_name"]
     reg.last_name = form.cleaned_data["last_name"]
     reg.email = form.cleaned_data["email"]
     reg.event_option = form.cleaned_data["option"]
+    
     if not reg.event_option.active: return False # Error: event_option is inactive. 
     reg.save()
+    
     for question in event.eventquestion_set.all():
         ans = Answer(question=question)
         ans.set_answer(form.cleaned_data[question.form_id()])
         ans.save()
         reg.answers.add(ans)
+    
+    for multiQuestion in event.multi_choice_questions.all():
+        reg.multi_choice_answers.add(form.cleaned_data[multiQuestion.name])
+    
     reg.save()
     return reg

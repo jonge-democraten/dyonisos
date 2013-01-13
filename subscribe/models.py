@@ -44,6 +44,23 @@ QUESTION_TYPES = (
     ("BOOL", "Ja/Nee"),
 )
 
+
+class MultiChoiceQuestion(models.Model):
+    name = models.CharField(max_length=256, blank=False, default='')
+    required = models.BooleanField(default=False)
+    
+    def __unicode__(self):
+        return self.name
+
+
+class MultiChoiceAnswer(models.Model):
+    name = models.CharField(max_length=256, blank=False, default='')
+    question = models.ForeignKey(MultiChoiceQuestion, blank=True, default='')
+    
+    def __unicode__(self):
+        return self.name
+
+
 class Event(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField()
@@ -54,6 +71,7 @@ class Event(models.Model):
     email_template = models.TextField(help_text="""Enkele placeholders:
 {{voornaam}}, {{achternaam}}, {{inschrijf_optie}}
     """)
+    multi_choice_questions = models.ManyToManyField(MultiChoiceQuestion, blank=True, default='')
     
     class Meta:
         ordering = ('-end_registration',)
@@ -127,7 +145,7 @@ class EventQuestion(models.Model):
         return u'<a href="/deleteEventQuestion/?questionId=%d&warning=%d">Delete</a>' % (self.id, 1)
     
     delete_event_question.allow_tags = True
-
+    
 
 class Answer(models.Model):
     question = models.ForeignKey(EventQuestion)
@@ -171,6 +189,7 @@ class Registration(models.Model):
     event_option = models.ForeignKey(EventOption)
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
+    multi_choice_answers = models.ManyToManyField(MultiChoiceAnswer, null=True)
     payed = models.BooleanField(default=False)
     trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=5)
@@ -259,6 +278,5 @@ class IdealIssuer(models.Model):
 
     def safe_id(self):
         return "%04d" % (self.issuer_id)
-
 
 
