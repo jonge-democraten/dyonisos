@@ -56,11 +56,6 @@ MEDIA_URL = 'https://static.example.com/'
 
 STATIC_URL = INSTALL_DIR + 'staticfiles/'
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = 'https://static.example.com/media/'
-
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
