@@ -220,7 +220,7 @@ class Registration(models.Model):
         msg["To"] = self.email
         # Send msg
         s = smtplib.SMTP("localhost:587")
-        s.sendmail(self.event.contact_email, [self.email], msg.as_string().encode('ascii','replace'))
+        s.sendmail(self.event.contact_email, [self.email], msg.as_string())
         s.quit()
 
     def check_payment_status(self):
