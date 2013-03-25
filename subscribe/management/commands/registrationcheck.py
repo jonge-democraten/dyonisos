@@ -17,7 +17,10 @@ class Command(BaseCommand):
         # check_ttl > 0 to check their payment status.        
         for r in Registration.objects.filter(payed=False).filter(trxid__isnull=False).filter(check_ttl__gt=0):
             isOlderThanSevenDays = now > ( r.registration_date + datetime.timedelta(days, seconds) )
-            isCheckedLastHour = now > ( r.payment_check_dates.all().latest('date').date + datetime.timedelta(0, hourInSeconds) )
+            isCheckedLastHour = False
+            if (r.payment_check_dates.count() > 0):
+              isCheckedLastHour = now > ( r.payment_check_dates.all().latest('date').date + datetime.timedelta(0, hourInSeconds) )
+            
             # only check if the registration is not older than 7 days
             # only check if there has not been a check the last hour
             if (not isOlderThanSevenDays) and (not isCheckedLastHour):
