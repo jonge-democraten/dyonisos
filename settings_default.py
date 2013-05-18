@@ -1,5 +1,11 @@
 # Django settings for Dyonisos project.
 
+MOLLIE = { # Mollie config
+    'partner_id': 0, # Mollie.nl accountnummer
+    'report_url': 'https://www.example.com/report',
+    'return_url': 'https://www.example.com/return'
+}
+
 INSTALL_DIR = '' # the Dyonisos root directory, for example: '/home/bart/dev/Dyonisos/'
 
 DEBUG = True
