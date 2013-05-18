@@ -275,6 +275,9 @@ class IdealIssuer(models.Model):
     
     def __unicode__(self):
         return self.name
+    
+    def safe_id(self):
+        return "%04d" % (self.issuer_id)
 
     class Meta:
         ordering = ['name']
