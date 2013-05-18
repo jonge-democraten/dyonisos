@@ -138,14 +138,18 @@ class MultiChoiceQuestionAdmin(admin.ModelAdmin):
     list_display = ['name', 'required',]
     inlines = [MultiChoiceAnswerInline]
     
+
+class IdealIssuerAdmin(admin.ModelAdmin):
+    model = IdealIssuer
+    list_display = ['issuer_id', 'name']
     
 admin.site.register(MultiChoiceQuestion, MultiChoiceQuestionAdmin)
-#admin.site.register(EventQuestion)
+admin.site.register(EventQuestion)
 admin.site.register(Event, EventAdmin)
-#admin.site.register(EventOption)
-#admin.site.register(Answer)
+admin.site.register(EventOption)
+admin.site.register(Answer)
 admin.site.register(Registration, RegistrationAdmin)
-#admin.site.register(IdealIssuer)
+admin.site.register(IdealIssuer, IdealIssuerAdmin)
 
 
 

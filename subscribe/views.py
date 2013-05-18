@@ -84,34 +84,6 @@ def register(request, slug):
     c.update(csrf(request))
     return render_to_response("form.html", c)
 
-def refresh_issuers(request):
-    oldest_issuer = IdealIssuer.objects.order_by('update')
-    if oldest_issuer:
-        if (oldest_issuer[0].update - datetime.datetime.now()).days <= 0:
-            # Don't update more than once a day.
-            return HttpResponse(_("Don't refresh more that once a day. Try again later."))
-    # Get the new Ideal issuer list
-    oIDC = iDEALConnector()
-    issuers = oIDC.GetIssuerList()
-    if issuers.IsResponseError():
-        # An error occurred
-        print "Error getting Ideal issuers: %s - %s" % (issuers.getErrorCode(), issuers.getErrorMessage())
-        return HttpResponse(_("An error occurred while getting the issuers list."))
-    dIssuers = issuers.getIssuerFullList()
-    for sIS, oIS in dIssuers.items():
-        issuer = IdealIssuer.objects.filter(issuer_id=oIS.getIssuerID())
-        if issuer:
-            issuer = issuer[0]
-        else:
-            issuer = IdealIssuer()
-            issuer.issuer_id = oIS.getIssuerID()
-        issuer.name = oIS.getIssuerName()
-        issuer.list_type = oIS.getIssuerListType()
-        issuer.save()
-    # Now delete older issuers
-    IdealIssuer.objects.filter(update__lte=datetime.datetime.now()+datetime.timedelta(-1,0,0)).delete()
-    return HttpResponse(_("Update successful."))
-
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
 def check(request):
     trxid = request.GET['trxid']
