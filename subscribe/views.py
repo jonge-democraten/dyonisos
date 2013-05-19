@@ -171,20 +171,6 @@ def update_all_event_transaction_statuses(request):
         
     return HttpResponse(_("All event transactions/registrations statuses updated"))
 
-@login_required
-def delete_event_option(request):
-    optionId = request.GET['optionId']
-    
-    usedInNRegistrations = Registration.objects.filter(event_option=optionId).count()
-    
-    if (usedInNRegistrations != 0):
-        return HttpResponse(_("Dit event option kan niet verwijderd worden omdat deze al gebruikt wordt in " + str(usedInNRegistrations) +
-                              " aanmeldingen. <br /> Verwijdering van dit event option zou deze aanmeldingen ongeldig maken en is daarom niet mogelijk."))
-    else:
-        eventOption = EventOption.objects.get(pk=optionId)
-        eventOption.delete()
-        
-        return HttpResponse(_("Event option werd nog niet gebruikt in een aanmelding en kon daarom succesvol verwijderd worden."))
     
 @login_required
 def delete_event_question(request):

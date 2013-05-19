@@ -78,9 +78,12 @@ export_events.short_description = "Export event subscriptions to excel."
 class EventOptionInline(admin.TabularInline):
     model = EventOption
     extra = 1
-    fields = ['name', 'price', 'active', 'delete_event_option',]
-    readonly_fields = ['delete_event_option',]
-    can_delete = False
+    fields = ['name', 'price', 'active',]
+    
+    def has_delete_permission(self, request, obj=None):
+        if Registration.objects.filter(event_option=obj).count() > 0:
+            return False # Can't delete EventOption with active subscriptions.
+        return True
 
 
 class EventQuestionInline(admin.TabularInline):

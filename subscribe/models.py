@@ -143,11 +143,6 @@ class EventQuestion(models.Model):
     def form_id(self):
         return "q%d" % (self.id)
     
-    def delete_event_question(self):
-        return u'<a href="/deleteEventQuestion/?questionId=%d&warning=%d">Delete</a>' % (self.id, 1)
-    
-    delete_event_question.allow_tags = True
-    
 
 class Answer(models.Model):
     question = models.ForeignKey(EventQuestion)
