@@ -99,32 +99,38 @@ def register(request, slug):
 
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
 def check(request):
-    trxid = request.GET['trxid']
-    try:
-        ec = int(request.GET['ec'].split("x")[0])
-    except:
-        return HttpResponse(_("iDEAL error(Technische fout): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
-
-    oIDC = iDEALConnector()
-    req_status = oIDC.RequestTransactionStatus(trxid)
-
-    if not req_status.IsResponseError():
+    trxid = request.GET['transaction_id']
+    buf = cStringIO.StringIO()
+    c = pycurl.Curl()
+    url = "https://secure.mollie.nl/xml/ideal?a=check&partnerid=%d&transaction_id=%s" % (
+        settings.MOLLIE['partner_id'], # Partner id
+        quote_plus(trxid)              # Transaction ID
+    )
+    if settings.MOLLIE["test_mode"]:
+        url += "&testmode=true"
+    c.setopt(c.URL, str(url))
+    c.setopt(c.WRITEFUNCTION, buf.write)
+    c.perform()
+    s = buf.getvalue()
+    response = objectify.fromstring(s)
+    buf.close()
+    
+    if not error_in_betaling: #TODO: docs specificeren geen error
         try:
             subscription = Registration.objects.get(id=ec)
         except:
             return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
-        if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
+        if response.order.payed: #TODO: test dit
             subscription.payed = True
             subscription.send_confirmation_email()
             subscription.save()
             return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
-        elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
+        elif andere_status: #TODO: verwerk en test alle andere opties
             return HttpResponse(_("Je betaling is geannuleerd."))
         else:
             return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
     else:
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
-
 
 # update the transaction status from the admin view
 @login_required
