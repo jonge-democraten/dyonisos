@@ -20,6 +20,7 @@ class Command(BaseCommand):
         c = pycurl.Curl()
         c.setopt(c.URL, 'https://secure.mollie.nl/xml/ideal?a=banklist')
         c.setopt(c.WRITEFUNCTION, buf.write)
+        c.setopt(c.SSL_VERIFYHOST, 2)
         c.perform()
         
         response = objectify.fromstring(buf.getvalue())
