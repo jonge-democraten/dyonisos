@@ -127,7 +127,6 @@ class EventOption(models.Model):
     
     def delete_event_option(self):
         return u'<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
-    
     delete_event_option.allow_tags = True
 
 
@@ -142,6 +141,9 @@ class EventQuestion(models.Model):
         return "%s (%s)" % (self.name, self.question_type)
     def form_id(self):
         return "q%d" % (self.id)
+    def delete_event_question(self):
+        return u'<a href="/deleteEventQuestion/?optionId=%d">Delete</a>' % (self.id)
+    delete_event_question.allow_tags = True
     
 
 class Answer(models.Model):
