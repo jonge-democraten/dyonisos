@@ -191,7 +191,7 @@ class Registration(models.Model):
     multi_choice_answers = models.ManyToManyField(MultiChoiceAnswer, null=True)
     payed = models.BooleanField(default=False)
     trxid = models.CharField(max_length=128, default="", blank=True)
-    check_ttl = models.IntegerField(default=5)
+    check_ttl = models.IntegerField(default=10)
     payment_check_dates = models.ManyToManyField(PaymentCheckDate)
     
     def __unicode__(self):
@@ -216,9 +216,12 @@ class Registration(models.Model):
         msg["From"] = self.event.contact_email
         msg["To"] = self.email
         # Send msg
-        s = smtplib.SMTP("localhost:587")
-        s.sendmail(self.event.contact_email, [self.email], msg.as_string())
-        s.quit()
+        try:
+            s = smtplib.SMTP("localhost:587")
+            s.sendmail(self.event.contact_email, [self.email], msg.as_string())
+            s.quit()
+        except:
+            logging.error("Could not send welcome mail to %s" % (self.email))
 
     def check_payment_status(self):
         if self.payed:
