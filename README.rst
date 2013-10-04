@@ -9,8 +9,12 @@ event to see who is subscribed to what.
 
 Installation
 ============
-Dyonisos needs Django and xlwt. The payDEAL library for handling iDEAL
-payments is included. If you want to handle payments, you need an iDEAL
+Most dependencies are handled by pip and `requirements.txt`.
+
+    $ pip install -r requirements.txt
+    
+The payDEAL library for handling iDEAL payments is included. 
+If you want to handle payments, you need an iDEAL
 advanced account with your bank.
 
 
