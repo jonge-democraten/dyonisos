@@ -16,7 +16,7 @@ def httpsrequest(url):
     return val
     
 
-def get_banks():
+def banklist():
     response = httpsrequest('https://secure.mollie.nl/xml/ideal?a=banklist')
     obj = objectify.fromstring(response)
     logging.info(obj.message)
