@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 
 """A thin Python wrapper for the Mollie API.
 https://www.mollie.nl/support/documentatie/betaaldiensten/ideal
@@ -21,7 +22,7 @@ __email__ = "floort@gmail.com"
 __status__ = "Developement"
 
 ################################################################################
-# Copyright (c) 2013, FLoor Terra <floort@gmail.com>
+# Copyright (c) 2013, Floor Terra <floort@gmail.com>
 #
 # Permission to use, copy, modify, and/or distribute this software for any 
 # purpose with or without fee is hereby granted, provided that the above 
@@ -139,6 +140,7 @@ def check(partnerid, transaction_id):
     return obj.order
     
 def get_error(obj):
+    """Return (code, message) on an error, False otherwise."""
     if hasattr(obj, "item"): # Error
         return (response.item.errorcode, response.item.message)
     else:
