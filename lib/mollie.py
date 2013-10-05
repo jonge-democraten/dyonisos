@@ -91,7 +91,10 @@ def httpsrequest(url):
 def banklist():
     response = httpsrequest('https://secure.mollie.nl/xml/ideal?a=banklist')
     obj = objectify.fromstring(response)
-    logging.info(obj.message)
+    err = get_error(obj)
+    if err:
+        logging.error("Error fetching banks: %s" % (err[1],))
+        return None
     for bank in obj.bank:
         yield bank
         
