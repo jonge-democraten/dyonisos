@@ -16,9 +16,7 @@
 
 import datetime
 from urllib import quote_plus
-import pycurl
-import cStringIO
-from lxml import objectify
+from lib import mollie
 
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseRedirect
@@ -31,8 +29,6 @@ from subscribe.models import Event, EventOption, EventQuestion
 from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
 
 from django.conf import settings
-
-from lib.ideal import *
 
 
 def _safe_string(s, max_len=32):
@@ -60,26 +56,19 @@ def register(request, slug):
                 return HttpResponse(_("Dank voor uw inschrijving"))
             
             # You need to pay
-            buf = cStringIO.StringIO()
-            c = pycurl.Curl()
-            url = "https://secure.mollie.nl/xml/ideal?a=fetch&partnerid=%d&description=%s&reporturl=%s&returnurl=%s&amount=%d&bank_id=%s" % (
+            response = mollie.fetch(
                 settings.MOLLIE['partner_id'],                    # Partner id
+                subscription.event_option.price,                  # Amount
+                quote_plus(form.cleaned_data["issuer"].safe_id()),# Bank ID
                 quote_plus(subscription.event_option.name),       # Description
                 quote_plus(settings.MOLLIE['report_url']),        # Report url
-                quote_plus(settings.MOLLIE['return_url']),        # Return url
-                subscription.event_option.price,                  # Amount
-                quote_plus(form.cleaned_data["issuer"].safe_id()) # Bank ID
+                quote_plus(settings.MOLLIE['return_url'])         # Return url
             )
-            c.setopt(c.URL, str(url))
-            c.setopt(c.WRITEFUNCTION, buf.write)
-            c.perform()
-            s = buf.getvalue()
-            response = objectify.fromstring(s)
-            buf.close()
             
-            if hasattr(response, "item"): # Error
+            err = mollie.get_error(response)
+            if err:
                 return HttpResponse(_("Technische fout, probeer later opnieuw.") + "\n\n%d: %s" % (
-                    response.item.errorcode, response.item.message
+                    err[0], err[1]
                 ))
             
             subscription.trxid = response.order.transaction_id

@@ -1,10 +1,40 @@
-import pycurl
+#!/usr/bin/env python
+
+"""A thin Python wrapper for the Mollie API.
+https://www.mollie.nl/support/documentatie/betaaldiensten/ideal
+"""
+
 import cStringIO
-from lxml import objectify
 import logging
 import urllib
 
-# Based on https://www.mollie.nl/support/documentatie/betaaldiensten/ideal
+import pycurl
+from lxml import objectify
+
+__author__ = "Floor Terra"
+__copyright__ = "Copyright 2013, Floor Terra"
+__credits__ = ["Floor Terra", ]
+__license__ = "GPL"
+__version__ = "1.0.1"
+__maintainer__ = "Floor Terra"
+__email__ = "floort@gmail.com"
+__status__ = "Developement"
+
+################################################################################
+# Copyright (c) 2013, FLoor Terra <floort@gmail.com>
+#
+# Permission to use, copy, modify, and/or distribute this software for any 
+# purpose with or without fee is hereby granted, provided that the above 
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH 
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY 
+# AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, 
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM 
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
+# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+# PERFORMANCE OF THIS SOFTWARE.
+################################################################################
 
 ERR_IMPROPER_INPUT_VALUE =  -1
 ERR_NO_PARTNERID =          -2
@@ -23,6 +53,26 @@ ERR_AMOUNT_TOO_LOW =        -14
 ERR_ACCOUNT_NOT_ALLOWED =   -15
 ERR_UNKNOWN_PROFILE =       -16
 ERR_RETURNURL_INVALID =     -17
+
+ERROR_MESSAGE = {
+    ERR_IMPROPER_INPUT_VALUE:	"Did not receive a proper input value.",
+    ERR_NO_PARTNERID:	        "A fetch was issued without specification of 'partnerid'.",
+    ERR_IMPROPER_REPORTURL:     "A fetch was issued without (proper) specification of 'reporturl'.",
+    ERR_NO_AMOUNT:	            "A fetch was issued without specification of 'amount'.",
+    ERR_NO_BANK_ID: 	        "A fetch was issued without specification of 'bank_id'.",
+    ERR_UNKNOWN_BANK_ID:	    "A fetch was issues without specification of a known 'bank_id'.",
+    ERR_NO_DESCRIPTION:	        "A fetch was issued without specification of 'description'.",
+    ERR_NO_TRANSACTION_ID: 	    "A check was issued without specification of transaction_id.",
+    ERR_ILLIGAL_CHARACTERS:	    "Transaction_id contains illegal characters. (Logged as attempt to mangle).",
+    ERR_UNKNOWN_ORDER:	        "This is an unknown order.",
+    ERR_NO_PARTERID:	        "A check was issued without specification of your partner_id.",
+    ERR_IMPROPER_RETURNURL:	    "A fetch was issued without (proper) specification of 'returnurl'.",
+    ERR_LOGIN_REQUIRED:	        "This amount is only permitted when iDEAL contract is signed and sent to Mollie.",
+    ERR_AMOUNT_TOO_LOW:	        "Minimum amount for an ideal transaction is € 1,20.",
+    ERR_ACCOUNT_NOT_ALLOWED:	"A fetch was issued for an account which is not allowed to accept iDEAL payments (yet).",
+    ERR_UNKNOWN_PROFILE: 	    "A fetch was issued for an unknown or inactive profile.",
+    ERR_RETURNURL_INVALID:	    "The provided 'returnurl' cannot be used."
+}
 
 
 def httpsrequest(url):
@@ -49,7 +99,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
         "a": "fetch",
         "partnerid": partnerid,
         "amount": amount,
-        "bank_id": "%04d" % (bank_id),
+        "bank_id": bank_id,
         "description": description,
         "reporturl": reporturl,
         "returnurl": returnurl,
@@ -70,7 +120,11 @@ def check():
     obj = objectify.fromstring(response)
     return obj.order
     
-    
+def get_error(obj):
+    if hasattr(obj, "item"): # Error
+        return (response.item.errorcode, response.item.message)
+    else:
+        return False
 
     
     

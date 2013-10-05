@@ -4,7 +4,7 @@ from django.db.transaction import commit_on_success
 from subscribe.models import IdealIssuer
 import datetime
 
-from lib.mollie import banklist
+from lib import mollie
 
 class Command(BaseCommand):
     
@@ -14,7 +14,7 @@ class Command(BaseCommand):
         # Clean old issuers
         IdealIssuer.objects.all().delete()
         
-        for bank in banklist():
+        for bank in mollie.banklist():
             issuer = IdealIssuer(issuer_id=bank.bank_id, name=bank.bank_name)
             issuer.save()
             print "%d\t%s" % (bank.bank_id, bank.bank_name)
