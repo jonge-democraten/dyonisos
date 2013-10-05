@@ -14,9 +14,9 @@ class Command(BaseCommand):
         # Clean old issuers
         IdealIssuer.objects.all().delete()
         
-        for (bank_id, bank_name) in banklist():
-            issuer = IdealIssuer(issuer_id=bank_id, name=bank_name)
+        for bank in banklist():
+            issuer = IdealIssuer(issuer_id=bank.bank_id, name=bank.bank_name)
             issuer.save()
-            print "%d\t%s" % (bank_id, bank_name)
+            print "%d\t%s" % (bank.bank_id, bank.bank_name)
         return
         
