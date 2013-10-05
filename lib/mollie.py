@@ -128,7 +128,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     order = obj.order
     return order
             
-def check():
+def check(partnerid, transaction_id):
     params = urllib.urlencode({
         "a": "check",
         "partnerid": partnerid,
