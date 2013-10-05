@@ -126,8 +126,11 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     })
     response = httpsrequest("https://www.mollie.nl/xml/ideal?%s" % params)
     obj = objectify.fromstring(response)
-    order = obj.order
-    return order
+    err = get_error(obj)
+    if err:
+        logging.error("Error fetching payment: %s" % (err[1],))
+        return obj
+    return obj.order
             
 def check(partnerid, transaction_id):
     params = urllib.urlencode({
@@ -142,7 +145,7 @@ def check(partnerid, transaction_id):
 def get_error(obj):
     """Return (code, message) on an error, False otherwise."""
     if hasattr(obj, "item"): # Error
-        return (response.item.errorcode, response.item.message)
+        return (obj.item.errorcode, obj.item.message)
     else:
         return False
 

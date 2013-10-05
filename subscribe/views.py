@@ -57,12 +57,12 @@ def register(request, slug):
             
             # You need to pay
             response = mollie.fetch(
-                settings.MOLLIE['partner_id'],                    # Partner id
-                subscription.event_option.price,                  # Amount
-                quote_plus(form.cleaned_data["issuer"].safe_id()),# Bank ID
-                quote_plus(subscription.event_option.name),       # Description
-                quote_plus(settings.MOLLIE['report_url']),        # Report url
-                quote_plus(settings.MOLLIE['return_url'])         # Return url
+                settings.MOLLIE['partner_id'],          # Partner id
+                subscription.event_option.price,        # Amount
+                form.cleaned_data["issuer"].safe_id(),  # Bank ID
+                subscription.event_option.name,         # Description
+                settings.MOLLIE['report_url'],          # Report url
+                settings.MOLLIE['return_url']           # Return url
             )
             
             err = mollie.get_error(response)
