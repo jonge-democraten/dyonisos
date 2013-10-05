@@ -13,9 +13,7 @@ Most dependencies are handled by pip and `requirements.txt`.
 
     $ pip install -r requirements.txt
     
-The payDEAL library for handling iDEAL payments is included. 
-If you want to handle payments, you need an iDEAL
-advanced account with your bank.
+You will need a Mollie.nl account to handle payments.
 
 
 Special credits
