@@ -17,8 +17,6 @@
 from django.db import models
 from django.template import Context, Template
 
-from lib.ideal import *
-
 import datetime
 import smtplib
 from email.mime.text import MIMEText
@@ -30,7 +28,7 @@ AFDELINGEN = (
     ("FR", "Friesland"),
     ("GR", "Groningen"),
     ("LH", "Leiden-Haaglanden"),
-    ("MS", "Maastricht"),
+    ("MS", "Limburg"),
     ("RD", "Rotterdam"),
     ("TW", "Twente"),
     ("UT", "Utrecht"),
