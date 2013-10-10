@@ -6,6 +6,8 @@ import datetime
 
 from lib import mollie
 
+# command to update bank list (ideal issuers)
+# run as 'python manage.py refresh_issuers'
 class Command(BaseCommand):
     
     @commit_on_success
