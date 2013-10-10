@@ -19,6 +19,7 @@ from django.template import Context, Template
 
 import datetime
 import smtplib
+import logging
 from email.mime.text import MIMEText
 
 AFDELINGEN = (
@@ -269,7 +270,9 @@ class Registration(models.Model):
 
 class IdealIssuer(models.Model):
     issuer_id = models.IntegerField()
+    update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=128)
+    list_type = models.CharField(max_length=128)
     
     def __unicode__(self):
         return self.name
