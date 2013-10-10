@@ -28,8 +28,8 @@ from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import commit_on_success
 
-from subscribe.models import Event, EventOption, EventQuestion
-from subscribe.forms import IdealIssuer, Registration, SubscribeForm, fill_subscription
+from subscribe.models import Event, EventQuestion
+from subscribe.forms import Registration, SubscribeForm, fill_subscription
 
 from django.conf import settings
 
