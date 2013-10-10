@@ -94,8 +94,8 @@ def banklist():
     err = get_error(obj)
     if err:
         logging.error("Error fetching banks: %s" % (err[1],))
-        return None
-    for bank in obj.bank:
+    else:
+      for bank in obj.bank:
         yield bank
         
 def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile_key=None):
