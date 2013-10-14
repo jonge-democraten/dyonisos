@@ -95,6 +95,12 @@ def returnPage(request):
     except:
         return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
     
+    if subscription.status == "":
+        check(request)
+        subscription = Registration.objects.get(trxid=transaction_id)
+        
+    print "view::returnPage() : " + subscription.status
+    
     if subscription.payed and subscription.status == "Success":
         return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
     elif subscription.status == "Cancelled":
@@ -103,6 +109,8 @@ def returnPage(request):
         return HttpResponse(_("Je betaling is om onbekende reden niet gelukt. Er is geen geld afgeschreven. Neem contact op met ict@jongedemocraten.nl of probeer het nogmaals."))
     elif subscription.status == "Expired":
         return HttpResponse(_("Je betaling is geannuleerd."))
+    elif subscription.status == "Open":
+        return HttpResponse(_("Je betaling wordt nog verwerkt. Als je binnen 15 minuten geen bevestigingsmail ontvangen hebt, is er waarschijnlijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
     else:
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
