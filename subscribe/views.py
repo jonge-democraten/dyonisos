@@ -15,11 +15,8 @@
 ############################################################################### 
 
 import datetime
-from urllib import quote_plus
+import logging
 from lib import mollie
-import cStringIO
-import pycurl
-from lxml import objectify
 
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseRedirect
@@ -90,40 +87,50 @@ def register(request, slug):
     return render_to_response("form.html", c)
 
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
-def check(request):
-    trxid = request.GET['transaction_id']
-    buf = cStringIO.StringIO()
-    c = pycurl.Curl()
-    url = "https://secure.mollie.nl/xml/ideal?a=check&partnerid=%d&transaction_id=%s" % (
-        settings.MOLLIE['partner_id'], # Partner id
-        quote_plus(trxid)              # Transaction ID
-    )
-    if settings.MOLLIE["test_mode"]:
-        url += "&testmode=true"
-    c.setopt(c.URL, str(url))
-    c.setopt(c.WRITEFUNCTION, buf.write)
-    c.perform()
-    s = buf.getvalue()
-    response = objectify.fromstring(s)
-    buf.close()
+def returnPage(request):
+    transaction_id = request.GET['transaction_id']
     
-    if not error_in_betaling: #TODO: docs specificeren geen error
-        try:
-            subscription = Registration.objects.get(id=ec)
-        except:
-            return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
-        if response.order.payed: #TODO: test dit
-            subscription.payed = True
-            subscription.send_confirmation_email()
-            subscription.save()
-            return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
-        elif andere_status: #TODO: verwerk en test alle andere opties
-            return HttpResponse(_("Je betaling is geannuleerd."))
-        else:
-            return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+    try:
+        subscription = Registration.objects.get(trxid=transaction_id)
+    except:
+        return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+    
+    if subscription.payed and subscription.status == "Success":
+        return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
+    elif subscription.status == "Cancelled":
+        return HttpResponse(_("Je betaling is geannuleerd."))
+    elif subscription.status == "Failure":
+        return HttpResponse(_("Je betaling is om onbekende reden niet gelukt. Er is geen geld afgeschreven. Neem contact op met ict@jongedemocraten.nl of probeer het nogmaals."))
+    elif subscription.status == "Expired":
+        return HttpResponse(_("Je betaling is geannuleerd."))
     else:
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
+         
+def check(request):
+    transaction_id = request.GET['transaction_id']
+    
+    response = mollie.check(settings.MOLLIE['partner_id'], transaction_id)  
+
+    try:
+        subscription = Registration.objects.get(trxid=transaction_id)
+    except:
+        logging.error("views::check() - cannot find subscription with transaction id: " + str(transaction_id))
+        
+    if response.order.status == "CheckedBefore":
+        return
+    elif response.order.payed and response.order.status == "Success": # Mollie gives payed=true and status=Success only once
+        subscription.payed = True
+        subscription.status = "Success"
+        subscription.send_confirmation_email()
+        subscription.save()
+        return
+    else:
+        subscription.payed = False
+        subscription.status = response.order.status
+        subscription.save() 
+
+          
 # update the transaction status from the admin view
 @login_required
 def update_transaction_status(request):
