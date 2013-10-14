@@ -8,7 +8,8 @@ urlpatterns = patterns('',
     # Inschrijf formulier
     (r'^inschrijven/(?P<slug>[\w-]+)/$', 'subscribe.views.register'),
 
-    (r'^check/$', 'subscribe.views.check'), # this is the merchant return url
+    (r'^report/$', 'subscribe.views.check'), # this is the merchant return url
+    (r'^return/$', 'subscribe.views.returnPage'), # this is the merchant return url
     (r'^updateEventTransactionStatuses/$', 'subscribe.views.update_all_event_transaction_statuses'),
     (r'^updateTransactionStatus/$', 'subscribe.views.update_transaction_status'),
     (r'^deleteEventQuestion/$', 'subscribe.views.delete_event_question'),
