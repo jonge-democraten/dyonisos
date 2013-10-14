@@ -103,7 +103,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
         if not amount.isdigit(): raise ValueError("Parameter amount should not contain non-digit characters.")
         amount = int(amount)
     elif type(amount) != int:
-        raise TypeError("Parameter amount should be a atring or an integer.")
+        raise TypeError("Parameter amount should be a string or an integer.")
     if type(bank_id) == int:
         # Bank_id should be a integer between 0 and 10000 with leading zeroes.
         if bank_id < 0: raise ValueError("Parameter bank_id should be larger then 0.")
@@ -133,17 +133,22 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     if err:
         logging.error("Error fetching payment: %s" % (err[1],))
         return obj
-    return obj.order
+    return obj
             
 def check(partnerid, transaction_id):
     params = urllib.urlencode({
         "a": "check",
         "partnerid": partnerid,
-        "transaction_id": transaction_id
+        "transaction_id": transaction_id,
     })
     response = httpsrequest("https://secure.mollie.nl/xml/ideal?%s" % params)
+    # response parameters:
+    # partnerid, testmode, transaction_id, amount,
+    # payed ('true' of 'false'. Geeft aan of er betaald is. Let op, wij houden bij of u al eerder succesvol gecheckt heeft. Dus als u de tweede keer checkt sinds de betaling, krijgt u hier 'false'.),
+    # status (Success, Cancelled, Failure, Expired, CheckedBefore)
+    # consumer, consumerName, consumerAccount, consumerCity
     obj = objectify.fromstring(response)
-    return obj.order
+    return obj
     
 def get_error(obj):
     """Return (code, message) on an error, False otherwise."""
