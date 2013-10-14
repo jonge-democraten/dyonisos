@@ -116,21 +116,24 @@ def check(request):
         subscription = Registration.objects.get(trxid=transaction_id)
     except:
         logging.error("views::check() - cannot find subscription with transaction id: " + str(transaction_id))
+        return HttpResponse(_("NOT OK"))
         
     if response.order.status == "CheckedBefore":
-        return
+        return HttpResponse(_("OK"))
     elif response.order.payed and response.order.status == "Success": # Mollie gives payed=true and status=Success only once
         subscription.payed = True
         subscription.status = "Success"
         subscription.send_confirmation_email()
         subscription.save()
-        return
+        return HttpResponse(_("OK"))
     else:
         subscription.payed = False
         subscription.status = response.order.status
         subscription.save() 
+    
+    return HttpResponse(_("OK"))
 
-          
+
 # update the transaction status from the admin view
 @login_required
 def update_transaction_status(request):
