@@ -189,9 +189,11 @@ class Registration(models.Model):
     answers = models.ManyToManyField(Answer, null=True)
     multi_choice_answers = models.ManyToManyField(MultiChoiceAnswer, null=True)
     payed = models.BooleanField(default=False)
+    status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=10)
     payment_check_dates = models.ManyToManyField(PaymentCheckDate)
+    
     
     def __unicode__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
