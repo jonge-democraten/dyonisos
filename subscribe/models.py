@@ -189,7 +189,6 @@ class Registration(models.Model):
     check_ttl = models.IntegerField(default=10)
     payment_check_dates = models.ManyToManyField(PaymentCheckDate)
     
-    
     def __unicode__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
 
@@ -218,45 +217,6 @@ class Registration(models.Model):
             s.quit()
         except:
             logging.error("Could not send welcome mail to %s" % (self.email))
-
-    def check_payment_status(self):
-        if self.payed:
-            return True # Has payed
-        if self.check_ttl <= 0:
-            return False # Give up and don't check again.
-        if not self.trxid:
-            return None # trxid not set, can't check
-        else:
-            # check payment with Mollie
-            
-            req_status = oIDC.RequestTransactionStatus(self.trxid)
-            self.add_payment_check_date()
-            if not req_status.IsResponseError():
-                if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
-                    self.payed = True
-                    self.send_confirmation_email()
-                    self.save()
-                    return True
-                elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
-                    self.check_ttl = 0 # Don't check again
-                    self.save()
-                    return False
-                else:
-                    self.check_ttl -= 1 # Check later
-                    self.save()
-                    return None
-            else:
-                print 'models::check_payment_status() - ERROR RequestTransactionStatus: ' + req_status.getErrorMessage()
-                self.check_ttl -= 1
-                self.save()
-                return None
-
-    def add_payment_check_date(self):
-        now = datetime.datetime.now()
-        checkDate = PaymentCheckDate(date=now)
-        checkDate.save()
-        self.payment_check_dates.add(checkDate)
-        self.save()
 
 
 class IdealIssuer(models.Model):
