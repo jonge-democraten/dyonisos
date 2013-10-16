@@ -110,7 +110,7 @@ def returnPage(request):
     elif subscription.status == "Expired":
         return HttpResponse(_("Je betaling is geannuleerd."))
     elif subscription.status == "Open":
-        return HttpResponse(_("Je betaling wordt nog verwerkt. Als je binnen 15 minuten geen bevestigingsmail ontvangen hebt, is er waarschijnlijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
+        return HttpResponse(_("Je betaling staat geregistreerd in ons systeem, maar wordt nog verwerkt door onze bank. Als je binnen een uur geen bevestigingsmail ontvangt, is er mogelijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
     else:
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
