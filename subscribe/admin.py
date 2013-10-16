@@ -14,7 +14,9 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ############################################################################### 
 
-from subscribe.models import *
+from subscribe.models import Registration, IdealIssuer
+from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer
+from subscribe.models import MultiChoiceQuestion, Answer
 from django.contrib import admin
 from django.http import HttpResponse
 
