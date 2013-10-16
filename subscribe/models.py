@@ -232,8 +232,8 @@ class Registration(models.Model):
         if not self.trxid:
             return None # trxid not set, can't check
         else:
-            # check payment with ideal provider
-            oIDC = iDEALConnector()
+            # check payment with Mollie
+            
             req_status = oIDC.RequestTransactionStatus(self.trxid)
             self.add_payment_check_date()
             if not req_status.IsResponseError():
@@ -254,13 +254,7 @@ class Registration(models.Model):
                 print 'models::check_payment_status() - ERROR RequestTransactionStatus: ' + req_status.getErrorMessage()
                 self.check_ttl -= 1
                 self.save()
-                return None                
-    
-    def update_transaction_status(self):
-        return u'<a href="/updateTransactionStatus/?ec=%d">Update Transaction Status</a>' % (self.id)
-    
-    update_transaction_status.allow_tags = True
-
+                return None
 
     def add_payment_check_date(self):
         now = datetime.datetime.now()

@@ -141,34 +141,6 @@ def check(request):
     
     return HttpResponse(_("OK"))
 
-
-# update the transaction status from the admin view
-@login_required
-def update_transaction_status(request):
-    ec = request.GET['ec']
-    subscription = Registration.objects.get(id=ec)
-    trxid = subscription.trxid
-
-    oIDC = iDEALConnector()
-    
-    req_status = oIDC.RequestTransactionStatus(trxid)
-    
-    if not req_status.IsResponseError():
-        print 'views::update_transaction_status() : ' + str(req_status.getStatus())
-        if req_status.getStatus() == IDEAL_TX_STATUS_SUCCESS:
-            subscription.payed = True
-            subscription.save()
-            subscription.send_confirmation_email()
-            return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
-        elif req_status.getStatus() == IDEAL_TX_STATUS_CANCELLED:
-            return HttpResponse(_("Betaling is geannuleerd."))
-        elif req_status.getStatus() == IDEAL_TX_STATUS_EXPIRED:
-            return HttpResponse(_("Niet betaald. De transactie sessie is verlopen. Via deze transactie kan niet meer betaald worden."))
-        elif req_status.getStatus() == IDEAL_TX_STATUS_OPEN:
-            return HttpResponse(_("Nog niet betaald, maar de betaalsessie is nog niet verlopen."))
-    else:
-        return HttpResponse(_("Er was een probleem met de iDeal verbinding om de transactie status op te vragen. ERROR: " + req_status.getErrorMessage()))
-
 @login_required
 @commit_on_success # combines all database transactions and commits them on success
 def update_all_event_transaction_statuses(request):
