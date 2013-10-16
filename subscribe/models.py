@@ -104,12 +104,7 @@ class Event(models.Model):
         if self.start_registration > now or self.end_registration < now:
             return False
         return True
-    #active.boolean = True    
-    
-    def update_all_event_transaction_statuses(self):
-        return u'<a href="/updateEventTransactionStatuses/?eventId=%d">Update all transactions</a>' % (self.id)
-            
-    update_all_event_transaction_statuses.allow_tags = True        
+    #active.boolean = True        
 
 
 class EventOption(models.Model):

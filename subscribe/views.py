@@ -140,19 +140,6 @@ def check(request):
         subscription.save() 
     
     return HttpResponse(_("OK"))
-
-@login_required
-@commit_on_success # combines all database transactions and commits them on success
-def update_all_event_transaction_statuses(request):
-    print 'views::update_all_event_transaction_statuses()'
-    eventId = request.GET['eventId']
-    
-    for r in Registration.objects.filter(event=eventId).filter(payed=False).filter(trxid__isnull=False).filter(check_ttl__gt=0):
-        print 'view::update_all_event_transaction_statuses() - registration id: ' + str(r.id)
-        r.check_payment_status()
-        
-    return HttpResponse(_("All event transactions/registrations statuses updated"))
-
     
 @login_required
 def delete_event_question(request):

@@ -10,7 +10,6 @@ urlpatterns = patterns('',
 
     (r'^report/$', 'subscribe.views.check'), # this is the merchant return url
     (r'^return/$', 'subscribe.views.returnPage'), # this is the merchant return url
-    (r'^updateEventTransactionStatuses/$', 'subscribe.views.update_all_event_transaction_statuses'),
     (r'^deleteEventQuestion/$', 'subscribe.views.delete_event_question'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
