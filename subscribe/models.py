@@ -216,7 +216,8 @@ class Registration(models.Model):
             s.sendmail(self.event.contact_email, [self.email], msg.as_string())
             s.quit()
         except:
-            logging.error("Could not send welcome mail to %s" % (self.email))
+            logger = logging.getLogger(__name__)
+            logger.error("Could not send welcome mail to %s" % (self.email))
 
 
 class IdealIssuer(models.Model):
