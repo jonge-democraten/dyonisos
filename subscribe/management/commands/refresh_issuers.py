@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from django.db.transaction import commit_on_success
 
 from subscribe.models import IdealIssuer
-import datetime
 
 from lib import mollie
 
