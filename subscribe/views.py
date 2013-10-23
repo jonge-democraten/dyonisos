@@ -87,7 +87,7 @@ def register(request, slug):
     return render_to_response("form.html", c)
 
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
-def returnPage(request):
+def return_page(request):
     transaction_id = request.GET['transaction_id']
     
     try:
@@ -98,8 +98,6 @@ def returnPage(request):
     if subscription.status == "":
         check(request)
         subscription = Registration.objects.get(trxid=transaction_id)
-        
-    print "view::returnPage() : " + subscription.status
     
     if subscription.payed and subscription.status == "Success":
         return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))

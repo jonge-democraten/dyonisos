@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     (r'^inschrijven/(?P<slug>[\w-]+)/$', 'subscribe.views.register'),
 
     (r'^report/$', 'subscribe.views.check'), # this is the merchant return url
-    (r'^return/$', 'subscribe.views.returnPage'), # this is the merchant return url
+    (r'^return/$', 'subscribe.views.return_page'), # this is the merchant return url
     (r'^deleteEventQuestion/$', 'subscribe.views.delete_event_question'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
