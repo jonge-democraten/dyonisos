@@ -36,23 +36,31 @@ def _safe_string(s, max_len=32):
     return filter(lambda c: c in safe, s)[:max_len]
 
 def register(request, slug):
+    logger = logging.getLogger(__name__)
+
+#    # create a file handler
+    logger.info('views::register() - start')
     event = get_object_or_404(Event, slug=slug)
     now = datetime.datetime.now()
     if event.start_registration > now or event.end_registration < now:
         return HttpResponse(_("Inschrijving gesloten."))
     #SubscribeForm = SubscribeFormBuilder(event)
     if request.method == "POST":
+        logger.info('views::register() - form POST')
         form = SubscribeForm(event, request.POST)
         if form.is_valid():
             # Store the data
             subscription = fill_subscription(form, event)
             if not subscription:
                 # Error Filling subscription
-                return HttpResponse(_("Error in saving form."))
+                error_str = "Error in saving form."
+                logger.error(error_str)
+                return HttpResponse(_(error_str))
             if subscription.event_option.price <= 0:
                 subscription.payed = True
                 subscription.send_confirmation_email()
                 subscription.save()
+                logger.info('views::register() - registered for a free event.')
                 return HttpResponse(_("Dank voor uw inschrijving"))
             
             # You need to pay
@@ -67,9 +75,9 @@ def register(request, slug):
             
             err = mollie.get_error(response)
             if err:
-                return HttpResponse(_("Technische fout, probeer later opnieuw.") + "\n\n%d: %s" % (
-                    err[0], err[1]
-                ))
+                error_str = "views::register() - Technische fout, probeer later opnieuw." + "\n\n%d: %s" % (err[0], err[1])
+                logger.error(error_str)
+                return HttpResponse(_(error_str))
             
             subscription.trxid = response.order.transaction_id
             subscription.save()
@@ -89,12 +97,16 @@ def register(request, slug):
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
 def return_page(request):
     transaction_id = request.GET['transaction_id']
-    
+    logger = logging.getLogger(__name__)
+    logger.info('views::return_page() - transaction id: ' + str(transaction_id))
     try:
         subscription = Registration.objects.get(trxid=transaction_id)
     except:
         return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
     
+    logger.info('views::return_page() - transaction in database: ' + subscription.status)
+    logger.info('views::return_page() - transaction payed: ' + str(subscription.payed))
+
     if subscription.status == "":
         check(request)
         subscription = Registration.objects.get(trxid=transaction_id)
@@ -116,12 +128,16 @@ def return_page(request):
 def check(request):
     transaction_id = request.GET['transaction_id']
     
+    logger = logging.getLogger(__name__)
+    logger.info('views::check() - transaction id: ' + str(transaction_id))
+    
     response = mollie.check(settings.MOLLIE['partner_id'], transaction_id)  
+    logger.info('views::check() - status: ' + str(response.order.status))
 
     try:
         subscription = Registration.objects.get(trxid=transaction_id)
     except:
-        logging.error("views::check() - cannot find subscription with transaction id: " + str(transaction_id))
+        logger.error("views::check() - cannot find subscription with transaction id: " + str(transaction_id))
         return HttpResponse(_("NOT OK"))
         
     if response.order.status == "CheckedBefore":
@@ -131,6 +147,7 @@ def check(request):
         subscription.status = "Success"
         subscription.send_confirmation_email()
         subscription.save()
+        logger.info('views::check() - payed, saved and mail sent')
         return HttpResponse(_("OK"))
     else:
         subscription.payed = False
