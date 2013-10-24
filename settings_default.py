@@ -4,7 +4,7 @@ MOLLIE = { # Mollie config
     'partner_id': 0, # Mollie.nl accountnummer
     'report_url': 'https://events.jd.nl/report/',
     'return_url': 'https://events.jd.nl/return/',
-    'test_mode': True
+    'testmode': 'true'
 }
 
 INSTALL_DIR = '' # the Dyonisos root directory, for example: '/home/bart/dev/Dyonisos/'

@@ -5,6 +5,8 @@
 https://www.mollie.nl/support/documentatie/betaaldiensten/ideal
 """
 
+from django.conf import settings
+
 import cStringIO
 import logging
 import urllib
@@ -89,16 +91,19 @@ def httpsrequest(url):
     
 
 def banklist():
-    response = httpsrequest('https://secure.mollie.nl/xml/ideal?a=banklist')
+    response = httpsrequest('https://secure.mollie.nl/xml/ideal?a=banklist&testmode=' + str(settings.MOLLIE['testmode']))
     obj = objectify.fromstring(response)
     err = get_error(obj)
     if err:
-        logging.error("Error fetching banks: %s" % (err[1],))
+        logger = logging.getLogger(__name__)
+        logger.error("mollie::banklist() - Error fetching banks: %s" % (err[1],))
     else:
       for bank in obj.bank:
         yield bank
         
-def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile_key=None):
+def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile_key=None):  
+    logger = logging.getLogger(__name__)
+    logger.info("mollie::fetch() - start")
     if type(amount) == str:
         if not amount.isdigit(): raise ValueError("Parameter amount should not contain non-digit characters.")
         amount = int(amount)
@@ -131,7 +136,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     obj = objectify.fromstring(response)
     err = get_error(obj)
     if err:
-        logging.error("Error fetching payment: %s" % (err[1],))
+        logger.error("mollie::fetch() - Error fetching payment: %s" % (err[1],))
         return obj
     return obj
             
@@ -140,12 +145,13 @@ def check(partnerid, transaction_id):
         "a": "check",
         "partnerid": partnerid,
         "transaction_id": transaction_id,
+        "&testmode": settings.MOLLIE['testmode'],
     })
     response = httpsrequest("https://secure.mollie.nl/xml/ideal?%s" % params)
     # response parameters:
     # partnerid, testmode, transaction_id, amount,
     # payed ('true' of 'false'. Geeft aan of er betaald is. Let op, wij houden bij of u al eerder succesvol gecheckt heeft. Dus als u de tweede keer checkt sinds de betaling, krijgt u hier 'false'.),
-    # status (Success, Cancelled, Failure, Expired, CheckedBefore)
+    # status (Success, Cancelled, Failure, Expired, CheckedBefore, Open)
     # consumer, consumerName, consumerAccount, consumerCity
     obj = objectify.fromstring(response)
     return obj
@@ -156,7 +162,3 @@ def get_error(obj):
         return (obj.item.errorcode, obj.item.message)
     else:
         return False
-
-    
-    
-    
