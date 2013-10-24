@@ -70,7 +70,8 @@ def register(request, slug):
                 form.cleaned_data["issuer"].safe_id(),  # Bank ID
                 subscription.event_option.name,         # Description
                 settings.MOLLIE['report_url'],          # Report url
-                settings.MOLLIE['return_url']           # Return url
+                settings.MOLLIE['return_url'],          # Return url
+                settings.MOLLIE['profile_key'],          # Return url
             )
             
             err = mollie.get_error(response)

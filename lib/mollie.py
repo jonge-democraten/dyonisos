@@ -101,7 +101,7 @@ def banklist():
       for bank in obj.bank:
         yield bank
         
-def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile_key=None):  
+def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile_key):  
     logger = logging.getLogger(__name__)
     logger.info("mollie::fetch() - start")
     if type(amount) == str:
@@ -145,7 +145,7 @@ def check(partnerid, transaction_id):
         "a": "check",
         "partnerid": partnerid,
         "transaction_id": transaction_id,
-        "&testmode": settings.MOLLIE['testmode'],
+        "testmode": settings.MOLLIE['testmode'],
     })
     response = httpsrequest("https://secure.mollie.nl/xml/ideal?%s" % params)
     # response parameters:
