@@ -2,8 +2,8 @@
 
 MOLLIE = { # Mollie config
     'partner_id': 0, # Mollie.nl accountnummer
-    'report_url': 'https://events.jd.nl/report/',
-    'return_url': 'https://events.jd.nl/return/',
+    'report_url': 'https://events.jongedemocraten.nl/report/',
+    'return_url': 'https://events.jongedemocraten.nl/return/',
     'testmode': 'true'
 }
 
