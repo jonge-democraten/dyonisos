@@ -7,7 +7,7 @@
 </head>
 <body>
   <h1>Inschrijven voor {{event.name}}</h1>
-  <div style="max-width:500px;">
+  <div style="max-width:800px;">
     <form method="POST" action="/inschrijven/{{event.slug}}/">
     {% csrf_token %}
       {{ form.as_p }}
@@ -16,11 +16,11 @@
   </div>
   <br/>
   <br/>
-  <div style="max-width:500px;">
+  <div style="max-width:800px;">
 	  Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser
 	  niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. Neem bij problemen contact op met het
 	  <a href="mailto:ict@jongedemocraten.nl?subject=iDEAL%20betaalfout">ICT-team</a>.
   </div>
-  <div id="description" style="max-width:500px;">{{event.description|safe}}</div>
+  <div id="description" style="max-width:800px;">{{event.description|safe}}</div>
 </body>
 </html>
