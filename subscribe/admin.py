@@ -29,7 +29,7 @@ def export_events(eventadmin, request, queryset):
     wb = Workbook()
     for event in queryset:
         # Put each event in it's own sheet
-        s = wb.add_sheet(event.name)
+        s = wb.add_sheet(event.slug)
         # Write header
         s.write(0,0,"Voornaam")
         s.write(0,1,"Achternaam")
