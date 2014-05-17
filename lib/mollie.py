@@ -120,7 +120,8 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     else:
         raise TypeError("Parameter bank_id should be a integer or a string.")
     if len(description) > 29:
-        raise ValueError("Parameter 'description' can't be longer than 29 characters.")
+        logger.info("mollie::fetch() - Parameter 'description' is longer than 29 characters. Only first 29 will be send.")
+        description = description[:29]
     
     params = urllib.urlencode({
         "a": "fetch",
