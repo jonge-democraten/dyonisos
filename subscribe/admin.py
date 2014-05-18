@@ -15,7 +15,7 @@
 ############################################################################### 
 
 from subscribe.models import Registration, IdealIssuer
-from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer
+from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer, RegistrationLimit
 from subscribe.models import MultiChoiceQuestion, Answer
 from django.contrib import admin
 from django.http import HttpResponse
@@ -95,6 +95,11 @@ class EventQuestionInline(admin.TabularInline):
     readonly_fields = ['delete_event_question',]
     can_delete = False
 
+class RegistrationLimitAdmin(admin.ModelAdmin):
+    model = RegistrationLimit
+    fields = ["limit", "event", "options", "description"]
+    list_display = ["event", "limit", "get_num_registrations", "is_reached", "description"]
+    extra = 1
 
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -158,11 +163,11 @@ class EventOptionAdmin(admin.ModelAdmin):
 admin.site.register(MultiChoiceQuestion, MultiChoiceQuestionAdmin)
 admin.site.register(EventQuestion)
 admin.site.register(Event, EventAdmin)
-admin.site.register(EventOption)
 admin.site.register(EventOption, EventOptionAdmin)
 admin.site.register(Answer)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(IdealIssuer, IdealIssuerAdmin)
+admin.site.register(RegistrationLimit, RegistrationLimitAdmin)
 
 
 
