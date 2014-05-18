@@ -71,7 +71,7 @@ def register(request, slug):
                 subscription.event_option.name,         # Description
                 settings.MOLLIE['report_url'],          # Report url
                 settings.MOLLIE['return_url'],          # Return url
-                settings.MOLLIE['profile_key'],          # Return url
+                settings.MOLLIE['profile_key'],         # Return url
             )
             
             err = mollie.get_error(response)
@@ -83,7 +83,8 @@ def register(request, slug):
             subscription.trxid = response.order.transaction_id
             subscription.save()
             
-            return HttpResponseRedirect(response.order.URL)
+            logger.info(response.order.URL)            
+            return HttpResponseRedirect(str(response.order.URL))
 
     else:
         form = SubscribeForm(event)
