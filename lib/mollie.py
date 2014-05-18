@@ -104,10 +104,12 @@ def banklist():
 def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile_key):  
     logger = logging.getLogger(__name__)
     logger.info("mollie::fetch() - start")
+    logger.info("type(amount) : " + str(type(amount)))
+
     if type(amount) == str:
         if not amount.isdigit(): raise ValueError("Parameter amount should not contain non-digit characters.")
         amount = int(amount)
-    elif type(amount) != int:
+    elif type(amount) != int and type(amount) != long:
         raise TypeError("Parameter amount should be a string or an integer.")
     if type(bank_id) == int:
         # Bank_id should be a integer between 0 and 10000 with leading zeroes.
