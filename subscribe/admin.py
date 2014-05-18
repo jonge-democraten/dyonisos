@@ -112,6 +112,7 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [EventQuestionInline, EventOptionInline]
     actions = [export_events,] #XXX: export
     list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration']
+    search_fields = ["name",]
     #list_filter = ['active', ]
     
 
@@ -129,6 +130,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     )
     list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", 'check_ttl', "event_option"]
     list_filter = ["payed", "event"]
+    search_fields = ["first_name", "last_name"]
 
 
 class MultiChoiceAnswerInline(admin.TabularInline):
@@ -148,10 +150,16 @@ class IdealIssuerAdmin(admin.ModelAdmin):
     model = IdealIssuer
     list_display = ['issuer_id', 'name']
     
+    
+class EventOptionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'price_str', 'event', 'active', 'limit_reached']
+    list_filter = ['active', 'event']
+    
 admin.site.register(MultiChoiceQuestion, MultiChoiceQuestionAdmin)
 admin.site.register(EventQuestion)
 admin.site.register(Event, EventAdmin)
 admin.site.register(EventOption)
+admin.site.register(EventOption, EventOptionAdmin)
 admin.site.register(Answer)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(IdealIssuer, IdealIssuerAdmin)
