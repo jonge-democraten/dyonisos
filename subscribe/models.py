@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2011,2014 Floor Terra <floort@gmail.com>
+# Copyright (c) 2011, Floor Terra <floort@gmail.com>
 # 
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -16,7 +16,6 @@
 
 from django.db import models
 from django.template import Context, Template
-from django.core.exceptions import ValidationError
 
 import datetime
 import smtplib
@@ -123,13 +122,7 @@ class EventOption(models.Model):
     def delete_event_option(self):
         return u'<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
     delete_event_option.allow_tags = True
-    
-    def limit_reached(self):
-        # Limit is reached when at least one of the registrationlimits has been reached
-        for l in self.registrationlimit_set.all():
-            if l.is_reached(): return True
-        return False
-    limit_reached.boolean = True
+
 
 class EventQuestion(models.Model):
     name = models.CharField(max_length=64)
@@ -225,11 +218,6 @@ class Registration(models.Model):
         except:
             logger = logging.getLogger(__name__)
             logger.error("Could not send welcome mail to %s" % (self.email))
-    
-    def clean(self):
-        for l in self.event_option.registrationlimit_set.all():
-            if l.is_reached():
-                raise ValidationError(l.description)
 
 
 class IdealIssuer(models.Model):
@@ -246,29 +234,4 @@ class IdealIssuer(models.Model):
 
     class Meta:
         ordering = ['name']
-        
-class RegistrationLimit(models.Model):
-    limit = models.IntegerField()
-    event = models.ForeignKey(Event, blank=True, null=True)
-    options = models.ManyToManyField(EventOption, blank=True)
-    description = models.CharField(max_length=128, help_text="De foutmelding die word weergegeven als de limiet bereikt is (bijv: het hotel is vol).")
-    
-    def __unicode__(self):
-        return u'Limiet: %d (%s)' % (self.limit, self.description)
-    
-    #def clean(self):
-        # Don't allow negative limits
-        #if self.limit < 0:
-        #    raise ValidationError('Limits below zero are not valid.')
-        # All options should belong to event
-        #for opt in self.options.objects.all():
-        #    if opt.event != self.event:
-        #        raise ValidationError("Eventoption %s does not belong to event %s." % (opt, self.event))
-    
-    def get_num_registrations(self):
-        return sum([opt.registration_set.count() for opt in self.options.iterator()])
-    
-    def is_reached(self):
-        return self.get_num_registrations() >= self.limit
-    is_reached.boolean = True
-    
+

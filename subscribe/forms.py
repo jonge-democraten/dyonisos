@@ -53,12 +53,7 @@ class SubscribeForm(forms.Form):
         for choiceQuestion in event.multi_choice_questions.all():
             self.fields[choiceQuestion.name] = forms.ModelChoiceField(queryset=MultiChoiceAnswer.objects.filter(question=choiceQuestion))
                 
-        # Clean the options that have reached their limit
-        for opt in event.eventoption_set.filter(active=True).all():
-            if opt.limit_reached():
-                opt.active=False
-                opt.save()
-        # Show active options
+        # Closing fixed options
         self.fields["option"] = forms.ModelChoiceField(
                                         queryset=event.eventoption_set.filter(active=True),
                                         label="Optie")
