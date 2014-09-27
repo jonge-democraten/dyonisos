@@ -29,7 +29,7 @@ def export_events(eventadmin, request, queryset):
     wb = Workbook()
     for event in queryset:
         # Put each event in it's own sheet
-        s = wb.add_sheet(event.slug)
+        s = wb.add_sheet(event.slug[:30]) # this is the max number of characters for an excel tab
         # Write header
         s.write(0,0,"Voornaam")
         s.write(0,1,"Achternaam")
