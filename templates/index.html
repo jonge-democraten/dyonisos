@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>JD Evenementen</title>
+  <link rel="stylesheet" type="text/css" href="https://jongedemocraten.nl/templates/jd/css/template.css">
+
+  <style>
+    .container { width: 605px; margin: 30px auto; }
+    th, td { padding-left: 10px; padding-right: 10px; }
+  </style>
+
+</head>
+
+<body>
+
+<div class="container">
+  <div>
+    <a href="/"><img src="http://jongedemocraten.nl/templates/jd/images/Logo.png" border="0" /></a>
+  </div>
+  <div>
+    <h2>Evenementen</h2>
+  </div>
+
+  <div>
+    {% if events %}
+      <table  cellpadding-left="10">
+      <tr>
+        <th>Naam</th>
+        <th>Omschrijving</th>
+        <th>Inschrijven</th>
+      </tr>  
+      {% for event in events %}
+      <tr>
+        <td> <b><a href="inschrijven/{{ event.slug }}">{{ event.name }}</a></b> </td>
+        <td> {{ event.description }} </td>
+        <td> <a href="inschrijven/{{ event.slug }}">Inschrijven</a> </td>
+      </tr>
+      {% endfor %}
+      </table>
+    {% else %}
+      Er zijn op dit moment geen evenementen om je voor in te schrijven.
+    {% endif %}
+  </div>
+  <hr> 
+  <div>
+    <h3> <a href="admin/">Admin </a> </h3>
+  </div>
+</div>
+ 
+</body>
+
+</html> 

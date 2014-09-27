@@ -1,3 +1,5 @@
+from subscribe.views import HomeView
+
 from django.conf.urls.defaults import include, patterns
 
 # Uncomment the next two lines to enable the admin:
@@ -6,6 +8,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Inschrijf formulier
+    (r'^$', HomeView.as_view()),
     (r'^inschrijven/(?P<slug>[\w-]+)/$', 'subscribe.views.register'),
 
     (r'^report/$', 'subscribe.views.check'), # this is the merchant return url

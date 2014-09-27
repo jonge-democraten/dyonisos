@@ -24,6 +24,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import commit_on_success
+from django.views.generic import TemplateView
 
 from subscribe.models import Event, EventQuestion
 from subscribe.forms import Registration, SubscribeForm, fill_subscription
@@ -173,3 +174,18 @@ def delete_event_question(request):
                                  <a href="/admin/">Nee</a>""" % (int(questionId), 0)))
 
 
+class HomeView(TemplateView):
+    template_name = "index.html"
+    context_object_name = "index"
+  
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(HomeView, self).get_context_data(**kwargs)
+        events = Event.objects.all()
+        eventsOpen = []
+        for event in events:
+            if (event.start_registration < datetime.datetime.now() and event.end_registration > datetime.datetime.now()):
+                eventsOpen.append(event)
+        context['events'] = eventsOpen
+        return context
+    
