@@ -24,20 +24,9 @@
 
   <div>
     {% if events %}
-      <table  cellpadding-left="10">
-      <tr>
-        <th>Naam</th>
-        <th>Omschrijving</th>
-        <th>Inschrijven</th>
-      </tr>  
       {% for event in events %}
-      <tr>
-        <td> <b><a href="inschrijven/{{ event.slug }}">{{ event.name }}</a></b> </td>
-        <td> {{ event.description }} </td>
-        <td> <a href="inschrijven/{{ event.slug }}">Inschrijven</a> </td>
-      </tr>
+        <h2><a href="inschrijven/{{ event.slug }}">{{ event.name }}</a></h2> 
       {% endfor %}
-      </table>
     {% else %}
       Er zijn op dit moment geen evenementen om je voor in te schrijven.
     {% endif %}
