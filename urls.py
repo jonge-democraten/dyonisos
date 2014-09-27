@@ -7,9 +7,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Inschrijf formulier
     (r'^$', HomeView.as_view()),
-    (r'^inschrijven/(?P<slug>[\w-]+)/$', 'subscribe.views.register'),
+    (r'^inschrijven/(?P<slug>[\w-]+)/$', 'subscribe.views.register'), # Inschrijf formulier
 
     (r'^report/$', 'subscribe.views.check'), # this is the merchant return url
     (r'^return/$', 'subscribe.views.return_page'), # this is the merchant return url
