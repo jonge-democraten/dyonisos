@@ -132,7 +132,7 @@ class EventQuestion(models.Model):
     event = models.ForeignKey(Event)
     
     def __unicode__(self):
-        return "%s (%s)" % (self.name, self.question_type)
+        return u"%s (%s)" % (self.name, self.question_type)
     def form_id(self):
         return "q%d" % (self.id)
     def delete_event_question(self):
@@ -147,7 +147,7 @@ class Answer(models.Model):
     bool_field = models.BooleanField(default=False)
     
     def __unicode__(self):
-        return "%s - %s" % (self.question, self.get_answer())
+        return u"%s - %s" % (self.question, self.get_answer())
     
     def set_answer(self, ans):
         if self.question.question_type == "INT":
@@ -190,7 +190,7 @@ class Registration(models.Model):
     payment_check_dates = models.ManyToManyField(PaymentCheckDate)
     
     def __unicode__(self):
-        return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
+        return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
 
     def gen_subscription_id(self):
         num_id = str(self.id)
