@@ -162,6 +162,3 @@ admin.site.register(EventOption, EventOptionAdmin)
 admin.site.register(Answer)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(IdealIssuer, IdealIssuerAdmin)
-
-
-

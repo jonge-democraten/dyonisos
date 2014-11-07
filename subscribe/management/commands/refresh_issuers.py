@@ -19,5 +19,3 @@ class Command(BaseCommand):
             issuer = IdealIssuer(issuer_id=bank.bank_id, name=bank.bank_name)
             issuer.save()
             print "%d\t%s" % (bank.bank_id, bank.bank_name)
-        return
-        
