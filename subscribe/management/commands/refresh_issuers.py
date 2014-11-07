@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.db.transaction import commit_on_success
+from django.db import transaction
 
 from subscribe.models import IdealIssuer
 
@@ -9,7 +9,7 @@ from lib import mollie
 # run as 'python manage.py refresh_issuers'
 class Command(BaseCommand):
     
-    @commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
     
         # Clean old issuers
