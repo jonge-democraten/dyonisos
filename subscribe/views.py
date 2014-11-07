@@ -95,7 +95,7 @@ def register(request, slug):
         "form": form,
     }
     c.update(csrf(request))
-    return render_to_response("form.html", c)
+    return render_to_response("subscribe/form.html", c)
 
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
 def return_page(request):
@@ -175,7 +175,7 @@ def delete_event_question(request):
 
 
 class HomeView(TemplateView):
-    template_name = "index.html"
+    template_name = "subscribe/index.html"
     context_object_name = "index"
   
     def get_context_data(self, **kwargs):
@@ -184,7 +184,8 @@ class HomeView(TemplateView):
         events = Event.objects.all()
         eventsOpen = []
         for event in events:
-            if (event.start_registration < datetime.datetime.now() and event.end_registration > datetime.datetime.now()):
+	    now = datetime.datetime.now()
+            if (event.start_registration < now and event.end_registration > now):
                 eventsOpen.append(event)
         context['events'] = eventsOpen
         return context

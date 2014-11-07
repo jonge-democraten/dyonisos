@@ -91,9 +91,7 @@ class EventOptionInline(admin.TabularInline):
 class EventQuestionInline(admin.TabularInline):
     model = EventQuestion
     extra = 1
-    fields = ['name', 'question_type', 'help', 'required', 'delete_event_question',]
-    readonly_fields = ['delete_event_question',]
-    can_delete = False
+    fields = ['name', 'question_type', 'help', 'required',]
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -113,8 +111,7 @@ class EventAdmin(admin.ModelAdmin):
     actions = [export_events,] #XXX: export
     list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration']
     search_fields = ["name",]
-    #list_filter = ['active', ]
-    
+
 
 class RegistrationAdmin(admin.ModelAdmin):
     #def get_form(self, request, obj=None, **kwargs):
