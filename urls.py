@@ -1,10 +1,9 @@
-from subscribe.views import HomeView
+from django.conf.urls import patterns, include, url
 
-from django.conf.urls.defaults import include, patterns
-
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
+
+from subscribe.views import HomeView
 
 urlpatterns = patterns('',
     (r'^$', HomeView.as_view()),
