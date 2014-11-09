@@ -70,7 +70,7 @@ def export_events(eventadmin, request, queryset):
             
     out = StringIO.StringIO()
     wb.save(out)
-    response = HttpResponse(out.getvalue(), mimetype="application/excel")
+    response = HttpResponse(out.getvalue(), content_type="application/excel")
     response['Content-Disposition'] = 'attachment; filename=events.xls'
     return response
 
