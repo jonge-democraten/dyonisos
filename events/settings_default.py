@@ -24,6 +24,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'subscribe', # the main app
+    'janeus',
 )
 
 MIDDLEWARE_CLASSES = (
