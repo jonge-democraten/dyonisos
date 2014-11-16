@@ -39,7 +39,6 @@ def _safe_string(s, max_len=32):
 def register(request, slug):
     logger = logging.getLogger(__name__)
 
-#    # create a file handler
     logger.info('views::register() - start')
     event = get_object_or_404(Event, slug=slug)
     now = datetime.datetime.now()
@@ -62,7 +61,7 @@ def register(request, slug):
                 subscription.send_confirmation_email()
                 subscription.save()
                 logger.info('views::register() - registered for a free event.')
-                return HttpResponse(_("Dank voor uw inschrijving"))
+                return HttpResponse(_("Inschrijving geslaagd. Ter bevestiging is een e-mail verstuurd."))
             
             # You need to pay
             response = mollie.fetch(
