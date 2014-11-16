@@ -1,10 +1,16 @@
+{% load staticfiles %}
+
 <!doctype html>
 <html lang="nl">
+
 <head>
   <meta charset="utf-8">
   <title>Inschrijven {{event.name}}</title>
-  <link rel="stylesheet" href="https://events-static.jongedemocraten.nl/css/signup_form.css">
+  
+  <link rel="stylesheet" href="{% static "subscribe/signup_form.css" %}">
 </head>
+
+
 <body>
   <h1>Inschrijven voor {{event.name}}</h1>
   <div style="max-width:800px;">
