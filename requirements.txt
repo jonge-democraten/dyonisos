@@ -1,5 +1,6 @@
-Django==1.4.8
-South==0.8.3
-xlwt==0.7.4
-pycurl==7.19.0
-lxml==3.3.3
+Django==1.7
+argparse==1.2.1
+lxml==3.4.0
+pycurl==7.19.5
+wsgiref==0.1.2
+xlwt==0.7.5
