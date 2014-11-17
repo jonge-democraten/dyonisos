@@ -1,4 +1,5 @@
 # Django settings for Dyonisos project.
+# use local_setings.py to configure local settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -8,10 +9,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = []
+
+ADMINS = (
+    ('name', 'name@domain.com'),
+)
 
 # Application definition
 
@@ -45,8 +50,8 @@ WSGI_APPLICATION = 'events.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'dev.sqlite',                   # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -118,14 +123,6 @@ LOGGING = {
     }
 }
 
-# Dyonisos specific configuration
 
-MOLLIE = { # Mollie config
-    'partner_id': 0, # Mollie.nl accountnummer
-    'profile_key': 0,
-    'report_url': 'https://events.jongedemocraten.nl/report/',
-    'return_url': 'https://events.jongedemocraten.nl/return/',
-    'testmode': 'false'
-}
-
+from local_settings import *
 
