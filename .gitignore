@@ -5,5 +5,4 @@ database.sqlite
 *.swp
 *~
 settings.py
-subscribe/migrations
 lib/includes/
