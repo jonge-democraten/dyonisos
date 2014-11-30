@@ -15,7 +15,7 @@
 ############################################################################### 
 
 from subscribe.models import Registration, IdealIssuer
-from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer
+from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer, RegistrationLimit
 from subscribe.models import MultiChoiceQuestion, Answer
 from django.contrib import admin
 from django.http import HttpResponse
@@ -93,6 +93,11 @@ class EventQuestionInline(admin.TabularInline):
     extra = 1
     fields = ['name', 'question_type', 'help', 'required',]
 
+class RegistrationLimitAdmin(admin.ModelAdmin):
+    model = RegistrationLimit
+    fields = ["limit", "event", "options", "description"]
+    list_display = ["event", "limit", "get_num_registrations", "is_reached", "description"]
+    extra = 1
 
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -149,7 +154,7 @@ class IdealIssuerAdmin(admin.ModelAdmin):
     
     
 class EventOptionAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price_str', 'event', 'active',]
+    list_display = ['name', 'price_str', 'event', 'active', 'limit_reached']
     list_filter = ['active', 'event']
     
 admin.site.register(MultiChoiceQuestion, MultiChoiceQuestionAdmin)
@@ -159,3 +164,4 @@ admin.site.register(EventOption, EventOptionAdmin)
 admin.site.register(Answer)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(IdealIssuer, IdealIssuerAdmin)
+admin.site.register(RegistrationLimit, RegistrationLimitAdmin)
