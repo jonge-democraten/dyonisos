@@ -93,11 +93,27 @@ class EventQuestionInline(admin.TabularInline):
     extra = 1
     fields = ['name', 'question_type', 'help', 'required',]
 
+
+class RegistrationLimitInline(admin.TabularInline):
+    model = RegistrationLimit
+    extra = 1
+    fields = ['limit', 'options', 'description']
+
+    def get_formset(self, request, obj=None, **kwargs):
+        self.parent_obj = obj
+        return super(RegistrationLimitInline, self).get_formset(request, obj, **kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        kwargs['queryset'] = db_field.rel.to.objects.filter(event=self.parent_obj)
+        return super(RegistrationLimitInline, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+
 class RegistrationLimitAdmin(admin.ModelAdmin):
     model = RegistrationLimit
     fields = ["limit", "event", "options", "description"]
     list_display = ["event", "limit", "get_num_registrations", "is_reached", "description"]
     extra = 1
+
 
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -112,7 +128,7 @@ class EventAdmin(admin.ModelAdmin):
     ]
     prepopulated_fields = {'slug': ('name',)}
     date_hierarchy = 'end_registration'
-    inlines = [EventQuestionInline, EventOptionInline]
+    inlines = [EventQuestionInline, EventOptionInline, RegistrationLimitInline]
     actions = [export_events,] #XXX: export
     list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration']
     search_fields = ["name",]
