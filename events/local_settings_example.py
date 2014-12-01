@@ -7,8 +7,6 @@ SECRET_KEY = ''
 DEBUG = False
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = []
-
 ADMINS = (
     ('name', 'name@domain.com'),
 )
