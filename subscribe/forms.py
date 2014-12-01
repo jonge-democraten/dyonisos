@@ -54,19 +54,21 @@ class SubscribeForm(forms.Form):
             self.fields[choiceQuestion.name] = forms.ModelChoiceField(queryset=MultiChoiceAnswer.objects.filter(question=choiceQuestion))
                 
         # Clean the options that have reached their limit
+        open_options_ids = []
         for opt in event.eventoption_set.filter(active=True).all():
-            if opt.limit_reached():
-                opt.active=False
-                opt.save()
+            if not opt.limit_reached():
+                open_options_ids.append(opt.id)
+                
         # Show active options
         self.fields["option"] = forms.ModelChoiceField(widget=forms.HiddenInput(),
                                                        required=False,
-                                                       queryset=event.eventoption_set.filter(active=True),
+                                                       queryset=event.eventoption_set.filter(id__in=open_options_ids),
                                                        label="Optie")
         
         self.fields["options"] = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                                                queryset=event.eventoption_set.filter(active=True),
+                                                                queryset=event.eventoption_set.filter(id__in=open_options_ids),
                                                                 label="Opties")
+        
         # Only show bank choice if at least one of the options costs money
         if not event.all_free():
             self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), 

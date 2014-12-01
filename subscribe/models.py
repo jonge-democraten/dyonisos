@@ -23,6 +23,8 @@ import smtplib
 import logging
 from email.mime.text import MIMEText
 
+logger = logging.getLogger(__name__)
+
 AFDELINGEN = (
     ("AMS", "Amsterdam"),
     ("AN", "Arnhem-Nijmegen"),
@@ -238,13 +240,7 @@ class Registration(models.Model):
             s.sendmail(self.event.contact_email, [self.email], msg.as_string())
             s.quit()
         except:
-            logger = logging.getLogger(__name__)
             logger.error("Could not send welcome mail to %s" % (self.email))
-    
-    def clean(self):
-        for l in self.event_option.registrationlimit_set.all():
-            if l.is_reached():
-                raise ValidationError(l.description)
 
 
 class IdealIssuer(models.Model):
@@ -272,7 +268,8 @@ class RegistrationLimit(models.Model):
         return u'Limiet: %d (%s)' % (self.limit, self.description)
     
     def get_num_registrations(self):
-        return sum([opt.registration_set.count() for opt in self.options.iterator()])
+        registrations = Registration.objects.all().filter(event_options=self.options.all())
+        return registrations.count()
     
     def is_reached(self):
         return self.get_num_registrations() >= self.limit
