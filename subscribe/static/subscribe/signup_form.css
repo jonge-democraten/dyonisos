@@ -50,10 +50,10 @@ form, #description {
   padding: .33em;
 }
 #description {
-width: 600px;
+width: 800px;
 }
 form {
-  /* display: inline-block; */
+  display: inline-block;
   padding-bottom: 1em;
 }
 form p {
@@ -65,11 +65,14 @@ form p {
 form p:hover {
   background-color: #f4f4f4;
 }
+th {
+  text-align: left;
+}
 label {
   display: block;
   float: left;
   clear: left;
-  min-width: 12em;
+  width: 17em;
   line-height: 31px;
   padding-left: .75em;
   padding-right: .5em;
@@ -123,7 +126,7 @@ ol.terms {
 ul.errorlist {
   list-style: none;
   position: absolute;
-  left: 27em;
+  left: 35em;
   margin: 0;
   line-height: 25px;
   margin: 3px;
@@ -134,3 +137,8 @@ ul.errorlist li {
   padding: 0 4px;
   border-radius: 4px;
 } 
+ul
+{
+  list-style-type: none;
+  padding-left: 0em;
+}

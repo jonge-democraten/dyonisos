@@ -17,15 +17,16 @@
   </div>
   
   <h1>Inschrijven voor {{event.name}}</h1>
-  <div style="max-width:600px;">
+  <div style="max-width:800px;">
     <form method="POST" action="/inschrijven/{{event.slug}}/">
     {% csrf_token %}
-      {{ form.as_p }}
+    <table style="width:100%;">
+      {{ form }}
+    </table>
       <input type="submit" value="Inschrijven!">
     </form>
   </div>
-  <br/>
-  <br/>
+
   <div id="description">{{event.description|safe}}</div>
   <div id="description">
 	  Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser
