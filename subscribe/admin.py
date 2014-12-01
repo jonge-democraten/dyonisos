@@ -14,6 +14,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ############################################################################### 
 
+import logging
+
 from subscribe.models import Registration, IdealIssuer
 from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer, RegistrationLimit
 from subscribe.models import MultiChoiceQuestion, Answer
@@ -36,19 +38,27 @@ def export_events(eventadmin, request, queryset):
         s.write(0,2,"Email")
         s.write(0,3,"Betaald")
         s.write(0,4,"Prijs")
-        s.write(0,5,"Optie")
-        s.write(0,6,"Purchase ID")
-        i = 7
+        s.write(0,5,"Purchase ID")
+        col_count = 6
+        
+        option_to_col = {}
+        event_options = EventOption.objects.filter(event=event)
+        for option in event_options:
+            option_to_col[option.id] = col_count
+            s.write(0, col_count, option.name)
+            col_count += 1
+            
         q_to_col = {}
         for question in EventQuestion.objects.filter(event=event):
-            q_to_col[question.id] = i
-            s.write(0,i,question.name)
-            i += 1
+            q_to_col[question.id] = col_count
+            s.write(0, col_count, question.name)
+            col_count += 1
+        
         mq_to_col = {}
         for multiQuestion in event.multi_choice_questions.all():
-            mq_to_col[multiQuestion.id] = i
-            s.write(0,i,multiQuestion.name)
-            i += 1
+            mq_to_col[multiQuestion.id] = col_count
+            s.write(0, col_count, multiQuestion.name)
+            col_count += 1
         # Write the data
         row = 1
         for reg in event.registration_set.all():
@@ -56,9 +66,15 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 1, reg.last_name)
             s.write(row, 2, reg.email)
             s.write(row, 3, reg.payed)
-            s.write(row, 4, float(reg.event_option.price)/100)
-            s.write(row, 5, reg.event_option.name)
-            s.write(row, 6, reg.id)
+            s.write(row, 4, float(reg.get_price())/100)
+            s.write(row, 5, reg.id)
+            
+            for option in reg.event_options.all():
+                s.write(row, option_to_col[option.id], 1)
+                
+            # for old style event options
+            if reg.event_option:
+                s.write(row, option_to_col[reg.event_option.id], 1)
             
             for ans in reg.answers.all():
                 s.write(row, q_to_col[ans.question.id], ans.get_answer())
@@ -83,9 +99,7 @@ class EventOptionInline(admin.TabularInline):
     fields = ['name', 'price', 'active',]
     
     def has_delete_permission(self, request, obj=None):
-        if Registration.objects.filter(event_option=obj).count() > 0:
-            return False # Can't delete EventOption with active subscriptions.
-        return True
+        return False
 
 
 class EventQuestionInline(admin.TabularInline):
@@ -135,18 +149,14 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class RegistrationAdmin(admin.ModelAdmin):
-    #def get_form(self, request, obj=None, **kwargs):
-    #    form = super(RegistrationAdmin,self).get_form(self,request, obj,**kwargs)
-    #    form.base_fields['event_option'].queryset =
-    #        form.base_fields['event_option'].queryset.filter(event_option_event = None)#XXX)
     readonly_fields = ('registration_date', 'trxid') 
     fieldsets = (
         (None, {
             'fields': ('registration_date', 'first_name', 'last_name', 
-                        'email', 'event', 'event_option', 'payed', 'trxid', 'status', 'check_ttl'),
+                        'email', 'event', 'event_options', 'payed', 'trxid', 'status', 'check_ttl'),
             }),
     )
-    list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", 'check_ttl', "event_option"]
+    list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", 'check_ttl']
     list_filter = ["payed", "event"]
     search_fields = ["first_name", "last_name"]
 

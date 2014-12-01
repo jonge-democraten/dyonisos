@@ -71,7 +71,7 @@ class Event(models.Model):
     description = models.TextField()
     contact_email = models.EmailField()
     email_template = models.TextField(help_text="""Enkele placeholders:
-{{voornaam}}, {{achternaam}}, {{inschrijf_optie}}
+{{voornaam}}, {{achternaam}}, {{inschrijf_opties}}
     """)
     multi_choice_questions = models.ManyToManyField(MultiChoiceQuestion, blank=True, default='')
     
@@ -88,7 +88,7 @@ class Event(models.Model):
         return len(Registration.objects.filter(event=self).filter(payed=True))
 
     def total_payed(self):
-        return u"\u20AC %.2f" % (sum([e.event_option.price for e in Registration.objects.filter(event=self).filter(payed=True)])/100.)
+        return u"\u20AC %.2f" % (sum([e.get_price() for e in Registration.objects.filter(event=self).filter(payed=True)])/100.)
     
     def form_link(self):
         return "<a href=\"https://events.jongedemocraten.nl/inschrijven/%s/\">Inschrijven</a>" % (self.slug)
@@ -149,7 +149,7 @@ class EventQuestion(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(EventQuestion)
-    int_field = models.IntegerField(default=0)
+    int_field = models.IntegerField(default=0, null=True)
     txt_field = models.CharField(max_length=256, blank=True)
     bool_field = models.BooleanField(default=False)
     
@@ -186,7 +186,8 @@ class Registration(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
-    event_option = models.ForeignKey(EventOption)
+    event_option = models.ForeignKey(EventOption, blank=True, null=True) # this model field is not used anymore, but old entries still have this
+    event_options = models.ManyToManyField(EventOption, related_name='event_options')
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
     multi_choice_answers = models.ManyToManyField(MultiChoiceAnswer, null=True)
@@ -196,20 +197,34 @@ class Registration(models.Model):
     check_ttl = models.IntegerField(default=10)
     payment_check_dates = models.ManyToManyField(PaymentCheckDate)
     
+    def get_price(self):
+        if self.event_option:
+           return self.event_option.price
+        price = 0 # price in cents
+        for event in self.event_options.all():
+            price += event.price
+        return price
+            
+    def get_options_name(self):
+        name = ''
+        for event in self.event_options.all():
+            name += event.name + ', '
+        return name
+    
     def __unicode__(self):
-        return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, self.event_option.price_str())
+        return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.get_price()))
 
     def gen_subscription_id(self):
         num_id = str(self.id)
         safe = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-        return num_id+"x"+filter(lambda c: c in safe, self.event_option.name)[:15-len(num_id)]
+        return num_id+"x"+filter(lambda c: c in safe, self.get_options_name())[:15-len(num_id)]
 
     def send_confirmation_email(self):
         t = Template(self.event.email_template)
         c = Context({
             "voornaam": self.first_name,
             "achternaam": self.last_name,
-            "inschrijf_optie": self.event_option,
+            "inschrijf_opties": self.get_options_name(),
         })
         #XXX: Financiele info
         msg = MIMEText(t.render(c).encode('utf-8'), 'plain', 'utf-8')

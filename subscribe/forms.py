@@ -35,16 +35,16 @@ class SubscribeForm(forms.Form):
             name = question.form_id()
             if question.question_type == "INT":
                 self.fields[name] = forms.IntegerField(label = question.name,
-                                                    required = question.required)
+                                                       required = question.required)
             elif question.question_type ==  "TXT":
                 self.fields[name] = forms.CharField(max_length=256,
                                                     label = question.name,
                                                     required = question.required)
             elif question.question_type == "AFD":
                 self.fields[name] = forms.CharField(max_length=256, 
-                                            label=question.name,
-                                            required=question.required,
-                                            widget=forms.Select(choices=AFDELINGEN))
+                                                    label=question.name,
+                                                    required=question.required,
+                                                    widget=forms.Select(choices=AFDELINGEN))
             elif question.question_type == "BOOL":
                 self.fields[name] = forms.BooleanField(label=question.name,
                                                        required=question.required)
@@ -59,13 +59,18 @@ class SubscribeForm(forms.Form):
                 opt.active=False
                 opt.save()
         # Show active options
-        self.fields["option"] = forms.ModelChoiceField(
-                                        queryset=event.eventoption_set.filter(active=True),
-                                        label="Optie")
+        self.fields["option"] = forms.ModelChoiceField(widget=forms.HiddenInput(),
+                                                       required=False,
+                                                       queryset=event.eventoption_set.filter(active=True),
+                                                       label="Optie")
+        
+        self.fields["options"] = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                                                queryset=event.eventoption_set.filter(active=True),
+                                                                label="Opties")
         # Only show bank choice if at least one of the options costs money
         if not event.all_free():
-            self.fields["issuer"] = forms.ModelChoiceField(
-                                queryset=IdealIssuer.objects.all(), label="Bank")
+            self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), 
+                                                           label="Bank (iDEAL)")
 
 
 def fill_subscription(form, event):
@@ -73,10 +78,12 @@ def fill_subscription(form, event):
     reg.first_name = form.cleaned_data["first_name"]
     reg.last_name = form.cleaned_data["last_name"]
     reg.email = form.cleaned_data["email"]
-    reg.event_option = form.cleaned_data["option"]
-    
-    if not reg.event_option.active: return False # Error: event_option is inactive. 
     reg.save()
+    reg.event_options = form.cleaned_data["options"]
+    
+    for option in reg.event_options.all():
+        if not option.active: 
+            return False # Error: event_option is inactive. 
     
     for question in event.eventquestion_set.all():
         ans = Answer(question=question)

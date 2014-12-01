@@ -56,7 +56,7 @@ def register(request, slug):
                 error_str = "Error in saving form."
                 logger.error(error_str)
                 return HttpResponse(_(error_str))
-            if subscription.event_option.price <= 0:
+            if subscription.get_price() <= 0:
                 subscription.payed = True
                 subscription.send_confirmation_email()
                 subscription.save()
@@ -66,9 +66,9 @@ def register(request, slug):
             # You need to pay
             response = mollie.fetch(
                 settings.MOLLIE['partner_id'],          # Partner id
-                subscription.event_option.price,        # Amount
+                subscription.get_price(),               # Amount
                 form.cleaned_data["issuer"].safe_id(),  # Bank ID
-                subscription.event_option.name,         # Description
+                subscription.get_options_name(),        # Description
                 settings.MOLLIE['report_url'],          # Report url
                 settings.MOLLIE['return_url'],          # Return url
                 settings.MOLLIE['profile_key'],         # Return url
