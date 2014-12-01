@@ -68,7 +68,7 @@ def register(request, slug):
                 settings.MOLLIE['partner_id'],          # Partner id
                 subscription.get_price(),               # Amount
                 form.cleaned_data["issuer"].safe_id(),  # Bank ID
-                subscription.get_options_name(),        # Description
+                subscription.event.name,                # Description
                 settings.MOLLIE['report_url'],          # Report url
                 settings.MOLLIE['return_url'],          # Return url
                 settings.MOLLIE['profile_key'],         # Return url
