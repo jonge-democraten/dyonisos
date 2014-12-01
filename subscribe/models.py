@@ -271,15 +271,6 @@ class RegistrationLimit(models.Model):
     def __unicode__(self):
         return u'Limiet: %d (%s)' % (self.limit, self.description)
     
-    #def clean(self):
-        # Don't allow negative limits
-        #if self.limit < 0:
-        #    raise ValidationError('Limits below zero are not valid.')
-        # All options should belong to event
-        #for opt in self.options.objects.all():
-        #    if opt.event != self.event:
-        #        raise ValidationError("Eventoption %s does not belong to event %s." % (opt, self.event))
-    
     def get_num_registrations(self):
         return sum([opt.registration_set.count() for opt in self.options.iterator()])
     
