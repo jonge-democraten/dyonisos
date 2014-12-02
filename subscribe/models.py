@@ -196,7 +196,6 @@ class Registration(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
-    event_option = models.ForeignKey(EventOption, blank=True, null=True)  # this model field is not used anymore, but old entries still have this
     event_options = models.ManyToManyField(EventOption, related_name='event_options')
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
@@ -209,8 +208,6 @@ class Registration(models.Model):
 
     def get_price(self):
         price = self.event.price  # price in cents
-        if self.event_option:
-            price += self.event_option.price
         for event in self.event_options.all():
             price += event.price
         return price

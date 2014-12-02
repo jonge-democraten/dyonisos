@@ -70,10 +70,6 @@ def export_events(eventadmin, request, queryset):
             for option in reg.event_options.all():
                 s.write(row, option_to_col[option.id], 1)
 
-            # for old style event options
-            if reg.event_option:
-                s.write(row, option_to_col[reg.event_option.id], 1)
-
             for ans in reg.answers.all():
                 s.write(row, q_to_col[ans.question.id], ans.get_answer())
 
