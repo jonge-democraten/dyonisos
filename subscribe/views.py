@@ -1,10 +1,9 @@
-###############################################################################
 # Copyright (c) 2011, Floor Terra <floort@gmail.com>
-# 
+#
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -12,7 +11,6 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-############################################################################### 
 
 import datetime
 import logging
@@ -23,7 +21,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
-from django.db.transaction import commit_on_success
 from django.views.generic import TemplateView
 
 from subscribe.models import Event, EventQuestion
@@ -36,6 +33,7 @@ def _safe_string(s, max_len=32):
     safe = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ")
     return filter(lambda c: c in safe, s)[:max_len]
 
+
 def register(request, slug):
     logger = logging.getLogger(__name__)
 
@@ -44,7 +42,7 @@ def register(request, slug):
     now = datetime.datetime.now()
     if event.start_registration > now or event.end_registration < now:
         return HttpResponse(_("Inschrijving gesloten."))
-    #SubscribeForm = SubscribeFormBuilder(event)
+    # SubscribeForm = SubscribeFormBuilder(event)
     if request.method == "POST":
         logger.info('views::register() - form POST')
         form = SubscribeForm(event, request.POST)
@@ -62,7 +60,7 @@ def register(request, slug):
                 subscription.save()
                 logger.info('views::register() - registered for a free event.')
                 return HttpResponse(_("Inschrijving geslaagd. Ter bevestiging is een e-mail verstuurd."))
-            
+
             # You need to pay
             response = mollie.fetch(
                 settings.MOLLIE['partner_id'],          # Partner id
@@ -73,17 +71,17 @@ def register(request, slug):
                 settings.MOLLIE['return_url'],          # Return url
                 settings.MOLLIE['profile_key'],         # Return url
             )
-            
+
             err = mollie.get_error(response)
             if err:
                 error_str = "views::register() - Technische fout, probeer later opnieuw." + "\n\n%d: %s" % (err[0], err[1])
                 logger.error(error_str)
                 return HttpResponse(_(error_str))
-            
+
             subscription.trxid = response.order.transaction_id
             subscription.save()
-            
-            logger.info(response.order.URL)            
+
+            logger.info(response.order.URL)
             return HttpResponseRedirect(str(response.order.URL))
 
     else:
@@ -96,6 +94,7 @@ def register(request, slug):
     c.update(csrf(request))
     return render_to_response("subscribe/form.html", c)
 
+
 # called when the user returns from iDeal, is set as MERCHANTRETURNURL.
 def return_page(request):
     transaction_id = request.GET['transaction_id']
@@ -105,14 +104,14 @@ def return_page(request):
         subscription = Registration.objects.get(trxid=transaction_id)
     except:
         return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
-    
+
     logger.info('views::return_page() - transaction in database: ' + subscription.status)
     logger.info('views::return_page() - transaction payed: ' + str(subscription.payed))
 
     if subscription.status == "":
         check(request)
         subscription = Registration.objects.get(trxid=transaction_id)
-    
+
     if subscription.payed and subscription.status == "Success":
         return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
     elif subscription.status == "Cancelled":
@@ -126,14 +125,14 @@ def return_page(request):
     else:
         return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
-         
+
 def check(request):
     transaction_id = request.GET['transaction_id']
-    
+
     logger = logging.getLogger(__name__)
     logger.info('views::check() - transaction id: ' + str(transaction_id))
-    
-    response = mollie.check(settings.MOLLIE['partner_id'], transaction_id)  
+
+    response = mollie.check(settings.MOLLIE['partner_id'], transaction_id)
     logger.info('views::check() - status: ' + str(response.order.status))
 
     try:
@@ -141,10 +140,10 @@ def check(request):
     except:
         logger.error("views::check() - cannot find subscription with transaction id: " + str(transaction_id))
         return HttpResponse(_("NOT OK"))
-        
+
     if response.order.status == "CheckedBefore":
         return HttpResponse(_("OK"))
-    elif response.order.payed and response.order.status == "Success": # Mollie gives payed=true and status=Success only once
+    elif response.order.payed and response.order.status == "Success":  # Mollie gives payed=true and status=Success only once
         subscription.payed = True
         subscription.status = "Success"
         subscription.send_confirmation_email()
@@ -154,38 +153,38 @@ def check(request):
     else:
         subscription.payed = False
         subscription.status = response.order.status
-        subscription.save() 
-    
+        subscription.save()
+
     return HttpResponse(_("OK"))
-    
+
+
 @login_required
 def delete_event_question(request):
     questionId = request.GET['questionId']
     warning = int(request.GET['warning'])
-    
+
     if warning == 0:
         eventQuestion = EventQuestion.objects.get(pk=questionId)
         eventQuestion.delete()
         return HttpResponse(_(u'Vraag verwijderd. <br /> <a href="/admin/">Terug naar admin.</a>'))
     else:
-        return HttpResponse(_("""Weet je zeker dat je deze vraag wilt verwijderen? <br /> 
-                                 <a href="/deleteEventQuestion/?questionId=%d&warning=%d">Ja</a> 
+        return HttpResponse(_("""Weet je zeker dat je deze vraag wilt verwijderen? <br />
+                                 <a href="/deleteEventQuestion/?questionId=%d&warning=%d">Ja</a>
                                  <a href="/admin/">Nee</a>""" % (int(questionId), 0)))
 
 
 class HomeView(TemplateView):
     template_name = "subscribe/index.html"
     context_object_name = "index"
-  
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(HomeView, self).get_context_data(**kwargs)
         events = Event.objects.all()
         eventsOpen = []
         for event in events:
-	    now = datetime.datetime.now()
+            now = datetime.datetime.now()
             if (event.start_registration < now and event.end_registration > now):
                 eventsOpen.append(event)
         context['events'] = eventsOpen
         return context
-    
