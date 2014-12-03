@@ -187,10 +187,6 @@ class Answer(models.Model):
             return self.bool_field
 
 
-class PaymentCheckDate(models.Model):
-    date = models.DateTimeField(auto_now_add=True)
-
-
 class Registration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=64)
@@ -204,7 +200,6 @@ class Registration(models.Model):
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=10)
-    payment_check_dates = models.ManyToManyField(PaymentCheckDate)
 
     def get_price(self):
         price = self.event.price  # price in cents
