@@ -133,7 +133,7 @@ class EventAdmin(admin.ModelAdmin):
             'fields': [
                 ('name', 'slug'),
                 ('start_registration', 'end_registration'),
-                'description'
+                'description', 'price',
             ]}),
         ("Email", {"fields": ["contact_email", "email_template"]}),
         ("Multiple choice questions", {'fields': ['multi_choice_questions']}),

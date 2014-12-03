@@ -72,10 +72,13 @@ label {
   display: block;
   float: left;
   clear: left;
-  width: 17em;
+  min-width: 17em;
   line-height: 31px;
-  padding-left: .75em;
+  padding-left: 0;
   padding-right: .5em;
+}
+td label {
+  width: 40em;
 }
 label:hover {
   text-decoration: underline;

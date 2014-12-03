@@ -73,6 +73,7 @@ class Event(models.Model):
     email_template = models.TextField(help_text="""Enkele placeholders:
 {{voornaam}}, {{achternaam}}, {{inschrijf_opties}}
     """)
+    price = models.IntegerField(help_text="Eurocenten", default=0)
     multi_choice_questions = models.ManyToManyField(MultiChoiceQuestion, blank=True, default='')
 
     class Meta:
@@ -96,6 +97,8 @@ class Event(models.Model):
 
     def all_free(self):
         """Are all event options free?"""
+        if self.price != 0:
+            return False
         if self.eventoption_set.filter(price__gt=0):
             return False
         return True
@@ -107,10 +110,13 @@ class Event(models.Model):
         return True
     # active.boolean = True
 
+    def price_str(self):
+        return u"\u20AC %.2f" % (float(self.price) / 100)
+
 
 class EventOption(models.Model):
     name = models.CharField(max_length=200)
-    price = models.IntegerField(help_text="Eurocenten")
+    price = models.IntegerField(help_text="Eurocenten", default=0)
     event = models.ForeignKey(Event)
     active = models.BooleanField(default=True)
 
@@ -202,9 +208,9 @@ class Registration(models.Model):
     payment_check_dates = models.ManyToManyField(PaymentCheckDate)
 
     def get_price(self):
+        price = self.event.price  # price in cents
         if self.event_option:
-            return self.event_option.price
-        price = 0  # price in cents
+            price += self.event_option.price
         for event in self.event_options.all():
             price += event.price
         return price

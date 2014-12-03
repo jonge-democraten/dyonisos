@@ -22,6 +22,9 @@
     {% csrf_token %}
     <table style="width:100%;">
       {{ form }}
+{% if event.price %}
+      <tr><th><strong>Basisbedrag:</strong></th><td>{{ event.price_str }}</td></tr>
+{% endif %}
     </table>
       <input type="submit" value="Inschrijven!">
     </form>
