@@ -41,6 +41,7 @@ QUESTION_TYPES = (
     ("TXT", "Text"),
     ("AFD", "Afdeling"),
     ("BOOL", "Ja/Nee"),
+    ("CHOICE", "Multiple Choice"),
 )
 
 
@@ -118,10 +119,14 @@ class EventOption(models.Model):
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten", default=0)
     event = models.ForeignKey(Event)
+    question = models.ForeignKey('EventQuestion', default=None, null=True, related_name="options")
     active = models.BooleanField(default=True)
 
     def __unicode__(self):
-        return u"%s - \u20AC %.2f" % (self.name, float(self.price) / 100)
+        if self.price != 0:
+            return u"%s - \u20AC %.2f" % (self.name, float(self.price) / 100)
+        else:
+            return u"%s" % (self.name,)
 
     def price_str(self):
         return u"\u20AC %.2f" % (float(self.price) / 100)
@@ -162,6 +167,7 @@ class Answer(models.Model):
     int_field = models.IntegerField(default=0, null=True)
     txt_field = models.CharField(max_length=256, blank=True)
     bool_field = models.BooleanField(default=False)
+    option = models.ForeignKey(EventOption, default=None, null=True)
 
     def __unicode__(self):
         return u"%s - %s" % (self.question, self.get_answer())
@@ -175,6 +181,8 @@ class Answer(models.Model):
             self.txt_field = ans
         elif self.question.question_type == "BOOL":
             self.bool_field = ans
+        elif self.question.question_type == "CHOICE":
+            self.option = ans
 
     def get_answer(self):
         if self.question.question_type == "INT":
@@ -185,6 +193,8 @@ class Answer(models.Model):
             return self.txt_field
         elif self.question.question_type == "BOOL":
             return self.bool_field
+        elif self.question.question_type == "CHOICE":
+            return self.option
 
 
 class Registration(models.Model):
@@ -205,12 +215,18 @@ class Registration(models.Model):
         price = self.event.price  # price in cents
         for event in self.event_options.all():
             price += event.price
+        for answer in self.answers.all():
+            if answer.option is not None:
+                price += answer.option.price
         return price
 
     def get_options_name(self):
         name = ''
         for event in self.event_options.all():
             name += event.name + ', '
+        for answer in self.answers.all():
+            if answer.option is not None:
+                name += answer.option.name + ', '
         return name
 
     def __unicode__(self):

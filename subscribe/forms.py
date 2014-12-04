@@ -39,6 +39,8 @@ class SubscribeForm(forms.Form):
                                                     widget=forms.Select(choices=AFDELINGEN))
             elif question.question_type == "BOOL":
                 self.fields[name] = forms.BooleanField(label=question.name, required=question.required)
+            elif question.question_type == "CHOICE":
+                self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.all())
 
         # The multiple choice questions
         for choiceQuestion in event.multi_choice_questions.all():
