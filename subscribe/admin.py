@@ -52,7 +52,7 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 1, reg.last_name)
             s.write(row, 2, reg.email)
             s.write(row, 3, reg.payed)
-            s.write(row, 4, float(reg.get_price()) / 100)
+            s.write(row, 4, float(reg.price) / 100)
             s.write(row, 5, reg.id)
 
             for ans in reg.answers.all():

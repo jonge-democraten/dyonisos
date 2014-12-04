@@ -14,6 +14,7 @@
 
 
 from django import forms
+from django.db import transaction
 
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
 
@@ -58,6 +59,7 @@ class SubscribeForm(forms.Form):
             self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)")
 
 
+@transaction.atomic
 def fill_subscription(form, event):
     reg = Registration(event=event)
     reg.first_name = form.cleaned_data["first_name"]
@@ -69,5 +71,8 @@ def fill_subscription(form, event):
         ans = Answer(registration=reg, question=question)
         ans.set_answer(form.cleaned_data[question.form_id()])
         ans.save()
+
+    reg.calculate_price()
+    reg.save()
 
     return reg

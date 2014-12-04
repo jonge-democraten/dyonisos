@@ -68,7 +68,7 @@ class Event(models.Model):
         return len(Registration.objects.filter(event=self).filter(payed=True))
 
     def total_payed(self):
-        return u"\u20AC %.2f" % (sum([e.get_price() for e in Registration.objects.filter(event=self).filter(payed=True)]) / 100.)
+        return u"\u20AC %.2f" % (sum([e.price for e in self.registraton_set.filter(payed=True)]) / 100.)
 
     def form_link(self):
         return "<a href=\"https://events.jongedemocraten.nl/inschrijven/%s/\">Inschrijven</a>" % (self.slug)
@@ -164,17 +164,14 @@ class Registration(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
     event = models.ForeignKey(Event)
+    price = models.IntegerField(default=0)
     payed = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
     check_ttl = models.IntegerField(default=10)
 
-    def get_price(self):
-        price = self.event.price  # price in cents
-        for answer in self.answers.all():
-            if answer.option is not None:
-                price += answer.option.price
-        return price
+    def calculate_price(self):
+        self.price = self.event.price + sum([answer.option.price for answer in self.answers.exclude(option=None)])
 
     def get_options_name(self):
         name = ''
@@ -184,7 +181,7 @@ class Registration(models.Model):
         return name
 
     def __unicode__(self):
-        return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.get_price()))
+        return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.price))
 
     def gen_subscription_id(self):
         num_id = str(self.id)
