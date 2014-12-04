@@ -99,6 +99,7 @@ class EventQuestion(models.Model):
     help = models.CharField(max_length=1024, blank=True)
     question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
     required = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
 
     def __unicode__(self):
         return u"%s (%s)" % (self.name, self.question_type)
