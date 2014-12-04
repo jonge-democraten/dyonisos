@@ -46,7 +46,7 @@ class SubscribeForm(forms.Form):
             elif question.question_type == "BOOL":
                 self.fields[name] = forms.BooleanField(label=question.name, required=question.required)
             elif question.question_type == "CHOICE":
-                self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options))
+                self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False))
 
         # Only show bank choice if at least one of the options costs money
         if not event.all_free():
