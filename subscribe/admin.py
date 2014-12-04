@@ -145,10 +145,7 @@ class AnswerInline(admin.TabularInline):
 
 class RegistrationAdmin(admin.ModelAdmin):
     readonly_fields = ('registration_date', 'trxid')
-    fieldsets = (
-        (None, {'fields': ('registration_date', 'first_name', 'last_name', 'email', 'event', 'payed', 'trxid', 'status', 'check_ttl'), }),
-    )
-    list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", 'check_ttl']
+    list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", ]
     list_filter = ["payed", "event"]
     search_fields = ["first_name", "last_name"]
     inlines = [AnswerInline]

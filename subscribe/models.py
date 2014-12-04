@@ -168,7 +168,6 @@ class Registration(models.Model):
     payed = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
-    check_ttl = models.IntegerField(default=10)
 
     def calculate_price(self):
         self.price = self.event.price + sum([answer.option.price for answer in self.answers.exclude(option=None)])
