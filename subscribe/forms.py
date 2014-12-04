@@ -44,7 +44,12 @@ class SubscribeForm(forms.Form):
                 self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
                                                     widget=forms.Select(choices=AFDELINGEN))
             elif question.question_type == "BOOL":
-                self.fields[name] = forms.BooleanField(label=question.name, required=question.required)
+                options = question.options.all()
+                if len(options) and options[0].price != 0:
+                    label = u"%s - \u20AC %.2f" % (question.name, float(options[0].price) / 100)
+                else:
+                    label = question.name
+                self.fields[name] = forms.BooleanField(label=label, required=question.required)
             elif question.question_type == "CHOICE":
                 self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False))
 

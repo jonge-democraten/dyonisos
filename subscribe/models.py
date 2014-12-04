@@ -234,6 +234,8 @@ class Answer(models.Model):
             self.txt_field = ans
         elif self.question.question_type == "BOOL":
             self.bool_field = ans
+            if len(self.question.options.all()):
+                self.option = self.question.options.all()[0]
         elif self.question.question_type == "CHOICE":
             self.option = ans
 
