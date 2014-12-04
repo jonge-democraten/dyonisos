@@ -139,6 +139,24 @@ class EventOption(models.Model):
     limit_reached.boolean = True
 
 
+class RegistrationLimit(models.Model):
+    limit = models.IntegerField()
+    event = models.ForeignKey(Event, blank=True, null=True)
+    options = models.ManyToManyField(EventOption, blank=True)
+    description = models.CharField(max_length=128, help_text="De foutmelding die word weergegeven als de limiet bereikt is (bijv: het hotel is vol).")
+
+    def __unicode__(self):
+        return u'Limiet: %d (%s)' % (self.limit, self.description)
+
+    def get_num_registrations(self):
+        registrations = Registration.objects.filter(answers__option__in=self.options.all())
+        return registrations.count()
+
+    def is_reached(self):
+        return self.get_num_registrations() >= self.limit
+    is_reached.boolean = True
+
+
 class Registration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=64)
@@ -245,21 +263,3 @@ class IdealIssuer(models.Model):
 
     class Meta:
         ordering = ['name']
-
-
-class RegistrationLimit(models.Model):
-    limit = models.IntegerField()
-    event = models.ForeignKey(Event, blank=True, null=True)
-    options = models.ManyToManyField(EventOption, blank=True)
-    description = models.CharField(max_length=128, help_text="De foutmelding die word weergegeven als de limiet bereikt is (bijv: het hotel is vol).")
-
-    def __unicode__(self):
-        return u'Limiet: %d (%s)' % (self.limit, self.description)
-
-    def get_num_registrations(self):
-        registrations = Registration.objects.filter(answers__option__in=self.options.all())
-        return registrations.count()
-
-    def is_reached(self):
-        return self.get_num_registrations() >= self.limit
-    is_reached.boolean = True
