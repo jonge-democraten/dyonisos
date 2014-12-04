@@ -112,7 +112,7 @@ class EventQuestion(models.Model):
 
 
 class EventOption(models.Model):
-    question = models.ForeignKey('EventQuestion', default=None, null=True, related_name="options")
+    question = models.ForeignKey('EventQuestion', related_name="options")
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten", default=0)
     active = models.BooleanField(default=True)
@@ -140,9 +140,9 @@ class EventOption(models.Model):
 
 
 class RegistrationLimit(models.Model):
-    limit = models.IntegerField()
-    event = models.ForeignKey(Event, blank=True, null=True)
+    event = models.ForeignKey(Event)
     options = models.ManyToManyField(EventOption, blank=True)
+    limit = models.IntegerField()
     description = models.CharField(max_length=128, help_text="De foutmelding die word weergegeven als de limiet bereikt is (bijv: het hotel is vol).")
 
     def __unicode__(self):
