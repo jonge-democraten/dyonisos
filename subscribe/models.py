@@ -94,11 +94,11 @@ class Event(models.Model):
 
 
 class EventQuestion(models.Model):
+    event = models.ForeignKey(Event)
     name = models.CharField(max_length=64)
     help = models.CharField(max_length=1024, blank=True)
     question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
     required = models.BooleanField(default=False)
-    event = models.ForeignKey(Event)
 
     def __unicode__(self):
         return u"%s (%s)" % (self.name, self.question_type)
@@ -112,9 +112,9 @@ class EventQuestion(models.Model):
 
 
 class EventOption(models.Model):
+    question = models.ForeignKey('EventQuestion', default=None, null=True, related_name="options")
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten", default=0)
-    question = models.ForeignKey('EventQuestion', default=None, null=True, related_name="options")
     active = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -139,48 +139,13 @@ class EventOption(models.Model):
     limit_reached.boolean = True
 
 
-class Answer(models.Model):
-    question = models.ForeignKey(EventQuestion)
-    int_field = models.IntegerField(default=0, null=True)
-    txt_field = models.CharField(max_length=256, blank=True)
-    bool_field = models.BooleanField(default=False)
-    option = models.ForeignKey(EventOption, default=None, null=True)
-
-    def __unicode__(self):
-        return u"%s - %s" % (self.question, self.get_answer())
-
-    def set_answer(self, ans):
-        if self.question.question_type == "INT":
-            self.int_field = ans
-        elif self.question.question_type == "TXT":
-            self.txt_field = ans
-        elif self.question.question_type == "AFD":
-            self.txt_field = ans
-        elif self.question.question_type == "BOOL":
-            self.bool_field = ans
-        elif self.question.question_type == "CHOICE":
-            self.option = ans
-
-    def get_answer(self):
-        if self.question.question_type == "INT":
-            return self.int_field
-        elif self.question.question_type == "TXT":
-            return self.txt_field
-        elif self.question.question_type == "AFD":
-            return self.txt_field
-        elif self.question.question_type == "BOOL":
-            return self.bool_field
-        elif self.question.question_type == "CHOICE":
-            return self.option
-
-
 class Registration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
     event = models.ForeignKey(Event)
-    answers = models.ManyToManyField(Answer, null=True)
+    answers = models.ManyToManyField('Answer', null=True)
     payed = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
@@ -228,6 +193,41 @@ class Registration(models.Model):
             s.quit()
         except:
             logger.error("Could not send welcome mail to %s" % (self.email))
+
+
+class Answer(models.Model):
+    question = models.ForeignKey(EventQuestion)
+    int_field = models.IntegerField(default=0, null=True)
+    txt_field = models.CharField(max_length=256, blank=True)
+    bool_field = models.BooleanField(default=False)
+    option = models.ForeignKey(EventOption, default=None, null=True)
+
+    def __unicode__(self):
+        return u"%s - %s" % (self.question, self.get_answer())
+
+    def set_answer(self, ans):
+        if self.question.question_type == "INT":
+            self.int_field = ans
+        elif self.question.question_type == "TXT":
+            self.txt_field = ans
+        elif self.question.question_type == "AFD":
+            self.txt_field = ans
+        elif self.question.question_type == "BOOL":
+            self.bool_field = ans
+        elif self.question.question_type == "CHOICE":
+            self.option = ans
+
+    def get_answer(self):
+        if self.question.question_type == "INT":
+            return self.int_field
+        elif self.question.question_type == "TXT":
+            return self.txt_field
+        elif self.question.question_type == "AFD":
+            return self.txt_field
+        elif self.question.question_type == "BOOL":
+            return self.bool_field
+        elif self.question.question_type == "CHOICE":
+            return self.option
 
 
 class IdealIssuer(models.Model):
