@@ -13,8 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 from subscribe.models import Registration, IdealIssuer
-from subscribe.models import Event, EventQuestion, EventOption, RegistrationLimit
-from subscribe.models import Answer
+from subscribe.models import Event, EventQuestion, EventOption, Answer, RegistrationLimit
 from django.contrib import admin
 from django.http import HttpResponse
 
@@ -103,7 +102,7 @@ class RegistrationLimitInline(admin.TabularInline):
         return super(RegistrationLimitInline, self).get_formset(request, obj, **kwargs)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        kwargs['queryset'] = db_field.rel.to.objects.filter(event=self.parent_obj)
+        kwargs['queryset'] = db_field.rel.to.objects.filter(question__event=self.parent_obj)
         return super(RegistrationLimitInline, self).formfield_for_manytomany(db_field, request, **kwargs)
 
 
@@ -126,7 +125,7 @@ class EventAdmin(admin.ModelAdmin):
     ]
     prepopulated_fields = {'slug': ('name',)}
     date_hierarchy = 'end_registration'
-    inlines = [EventQuestionInline, EventOptionInline, RegistrationLimitInline]
+    inlines = [EventQuestionInline, RegistrationLimitInline]
     actions = [export_events, ]  # XXX: export
     list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration']
     search_fields = ["name", ]
@@ -135,8 +134,7 @@ class EventAdmin(admin.ModelAdmin):
 class RegistrationAdmin(admin.ModelAdmin):
     readonly_fields = ('registration_date', 'trxid')
     fieldsets = (
-        (None, {'fields': ('registration_date', 'first_name', 'last_name',
-                           'email', 'event', 'event_options', 'payed', 'trxid', 'status', 'check_ttl'), }),
+        (None, {'fields': ('registration_date', 'first_name', 'last_name', 'email', 'event', 'payed', 'trxid', 'status', 'check_ttl'), }),
     )
     list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", 'check_ttl']
     list_filter = ["payed", "event"]
@@ -149,8 +147,8 @@ class IdealIssuerAdmin(admin.ModelAdmin):
 
 
 class EventOptionAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price_str', 'event', 'active', 'limit_reached']
-    list_filter = ['active', 'event']
+    list_display = ['name', 'price_str', 'active', 'limit_reached']
+    list_filter = ['active', ]
 
 
 admin.site.register(EventQuestion)

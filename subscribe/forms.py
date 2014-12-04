@@ -21,6 +21,13 @@ from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
 class SubscribeForm(forms.Form):
     def __init__(self, event, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
+
+        # Check the limits
+        closed_options = []
+        for limit in event.registrationlimit_set.all():
+            if limit.is_reached():
+                closed_options += [o.pk for o in limit.options.all()]
+
         # First the mandatory fields
         self.fields["first_name"] = forms.CharField(max_length=64, required=True, label="Voornaam")
         self.fields["last_name"] = forms.CharField(max_length=64, required=True, label="Achternaam")
@@ -39,23 +46,7 @@ class SubscribeForm(forms.Form):
             elif question.question_type == "BOOL":
                 self.fields[name] = forms.BooleanField(label=question.name, required=question.required)
             elif question.question_type == "CHOICE":
-                self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.all())
-
-        # Clean the options that have reached their limit
-        open_options_ids = []
-        for opt in event.eventoption_set.filter(active=True).all():
-            if not opt.limit_reached():
-                open_options_ids.append(opt.id)
-
-        # Show active options
-        self.fields["option"] = forms.ModelChoiceField(widget=forms.HiddenInput(),
-                                                       required=False,
-                                                       queryset=event.eventoption_set.filter(id__in=open_options_ids),
-                                                       label="Optie")
-
-        self.fields["options"] = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-                                                                queryset=event.eventoption_set.filter(id__in=open_options_ids),
-                                                                label="Opties")
+                self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options))
 
         # Only show bank choice if at least one of the options costs money
         if not event.all_free():
@@ -68,11 +59,6 @@ def fill_subscription(form, event):
     reg.last_name = form.cleaned_data["last_name"]
     reg.email = form.cleaned_data["email"]
     reg.save()
-    reg.event_options = form.cleaned_data["options"]
-
-    for option in reg.event_options.all():
-        if not option.active:
-            return False  # Error: event_option is inactive.
 
     for question in event.eventquestion_set.all():
         ans = Answer(question=question)

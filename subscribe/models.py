@@ -52,9 +52,7 @@ class Event(models.Model):
     end_registration = models.DateTimeField()
     description = models.TextField()
     contact_email = models.EmailField()
-    email_template = models.TextField(help_text="""Enkele placeholders:
-{{voornaam}}, {{achternaam}}, {{inschrijf_opties}}
-    """)
+    email_template = models.TextField(help_text="Enkele placeholders: {{voornaam}}, {{achternaam}}, {{inschrijf_opties}}")
     price = models.IntegerField(help_text="Eurocenten", default=0)
 
     class Meta:
@@ -98,7 +96,6 @@ class Event(models.Model):
 class EventOption(models.Model):
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten", default=0)
-    event = models.ForeignKey(Event)
     question = models.ForeignKey('EventQuestion', default=None, null=True, related_name="options")
     active = models.BooleanField(default=True)
 
@@ -182,7 +179,6 @@ class Registration(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
-    event_options = models.ManyToManyField(EventOption, related_name='event_options')
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
     payed = models.BooleanField(default=False)
@@ -192,8 +188,6 @@ class Registration(models.Model):
 
     def get_price(self):
         price = self.event.price  # price in cents
-        for event in self.event_options.all():
-            price += event.price
         for answer in self.answers.all():
             if answer.option is not None:
                 price += answer.option.price
@@ -201,8 +195,6 @@ class Registration(models.Model):
 
     def get_options_name(self):
         name = ''
-        for event in self.event_options.all():
-            name += event.name + ', '
         for answer in self.answers.all():
             if answer.option is not None:
                 name += answer.option.name + ', '
@@ -264,7 +256,7 @@ class RegistrationLimit(models.Model):
         return u'Limiet: %d (%s)' % (self.limit, self.description)
 
     def get_num_registrations(self):
-        registrations = Registration.objects.all().filter(event_options=self.options.all())
+        registrations = Registration.objects.filter(answers__option__in=self.options.all())
         return registrations.count()
 
     def is_reached(self):
