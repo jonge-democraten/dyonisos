@@ -75,6 +75,7 @@ class EventQuestionInline(admin.TabularInline):
     fields = ['name', 'admin_link', 'order', 'question_type', 'help', 'required', ]
     readonly_fields = ('admin_link',)
     show_change_link = True  # Django 1.8
+    ordering = ('order',)
 
     def admin_link(self, instance):
         url = reverse('admin:subscribe_eventquestion_change', args=(instance.id,))
