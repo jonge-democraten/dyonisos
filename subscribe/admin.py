@@ -15,7 +15,9 @@
 from subscribe.models import Registration, IdealIssuer
 from subscribe.models import Event, EventQuestion, EventOption, Answer, RegistrationLimit
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.utils.html import format_html
 
 from xlwt import Workbook
 import cStringIO as StringIO
@@ -37,15 +39,8 @@ def export_events(eventadmin, request, queryset):
         s.write(0, 5, "Purchase ID")
         col_count = 6
 
-        option_to_col = {}
-        event_options = EventOption.objects.filter(event=event)
-        for option in event_options:
-            option_to_col[option.id] = col_count
-            s.write(0, col_count, option.name)
-            col_count += 1
-
         q_to_col = {}
-        for question in EventQuestion.objects.filter(event=event):
+        for question in event.eventquestion_set.all():
             q_to_col[question.id] = col_count
             s.write(0, col_count, question.name)
             col_count += 1
@@ -60,11 +55,8 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 4, float(reg.get_price()) / 100)
             s.write(row, 5, reg.id)
 
-            for option in reg.event_options.all():
-                s.write(row, option_to_col[option.id], 1)
-
             for ans in reg.answers.all():
-                s.write(row, q_to_col[ans.question.id], ans.get_answer())
+                s.write(row, q_to_col[ans.question.id], u'{}'.format(ans.get_answer()))
 
             row += 1
 
@@ -77,19 +69,16 @@ def export_events(eventadmin, request, queryset):
 export_events.short_description = "Export event subscriptions to excel."
 
 
-class EventOptionInline(admin.TabularInline):
-    model = EventOption
-    extra = 1
-    fields = ['name', 'price', 'active', ]
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
 class EventQuestionInline(admin.TabularInline):
     model = EventQuestion
     extra = 1
-    fields = ['name', 'question_type', 'help', 'required', ]
+    fields = ['name', 'admin_link', 'order', 'question_type', 'help', 'required', ]
+    readonly_fields = ('admin_link',)
+    show_change_link = True  # Django 1.8
+
+    def admin_link(self, instance):
+        url = reverse('admin:subscribe_eventquestion_change', args=(instance.id,))
+        return format_html(u'<a href="{}">Edit</a>', url)
 
 
 class RegistrationLimitInline(admin.TabularInline):
@@ -104,13 +93,6 @@ class RegistrationLimitInline(admin.TabularInline):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         kwargs['queryset'] = db_field.rel.to.objects.filter(question__event=self.parent_obj)
         return super(RegistrationLimitInline, self).formfield_for_manytomany(db_field, request, **kwargs)
-
-
-class RegistrationLimitAdmin(admin.ModelAdmin):
-    model = RegistrationLimit
-    fields = ["limit", "event", "options", "description"]
-    list_display = ["event", "limit", "get_num_registrations", "is_reached", "description"]
-    extra = 1
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -131,6 +113,35 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ["name", ]
 
 
+class EventOptionInline(admin.TabularInline):
+    model = EventOption
+    extra = 1
+    fields = ['name', 'price', 'active', ]
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class EventQuestionAdmin(admin.ModelAdmin):
+    inlines = [EventOptionInline]
+
+
+class AnswerInline(admin.TabularInline):
+    model = Answer
+    fields = ['question', 'int_field', 'txt_field', 'bool_field', 'option']
+    readonly_fields = ['question', ]
+    extra = 0
+
+    def get_formset(self, request, obj=None, **kwargs):
+        self.parent_obj = obj
+        return super(AnswerInline, self).get_formset(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "option":
+            kwargs['queryset'] = db_field.rel.to.objects.filter(question__event=self.parent_obj.event)
+        return super(AnswerInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 class RegistrationAdmin(admin.ModelAdmin):
     readonly_fields = ('registration_date', 'trxid')
     fieldsets = (
@@ -139,6 +150,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     list_display = ["id", "event", "first_name", "last_name", "registration_date", "payed", "trxid", "status", 'check_ttl']
     list_filter = ["payed", "event"]
     search_fields = ["first_name", "last_name"]
+    inlines = [AnswerInline]
 
 
 class IdealIssuerAdmin(admin.ModelAdmin):
@@ -146,15 +158,7 @@ class IdealIssuerAdmin(admin.ModelAdmin):
     list_display = ['issuer_id', 'name']
 
 
-class EventOptionAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price_str', 'active', 'limit_reached']
-    list_filter = ['active', ]
-
-
-admin.site.register(EventQuestion)
+admin.site.register(EventQuestion, EventQuestionAdmin)
 admin.site.register(Event, EventAdmin)
-admin.site.register(EventOption, EventOptionAdmin)
-admin.site.register(Answer)
 admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(IdealIssuer, IdealIssuerAdmin)
-admin.site.register(RegistrationLimit, RegistrationLimitAdmin)
