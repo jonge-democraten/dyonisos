@@ -93,6 +93,24 @@ class Event(models.Model):
         return u"\u20AC %.2f" % (float(self.price) / 100)
 
 
+class EventQuestion(models.Model):
+    name = models.CharField(max_length=64)
+    help = models.CharField(max_length=1024, blank=True)
+    question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
+    required = models.BooleanField(default=False)
+    event = models.ForeignKey(Event)
+
+    def __unicode__(self):
+        return u"%s (%s)" % (self.name, self.question_type)
+
+    def form_id(self):
+        return "q%d" % (self.id)
+
+    def delete_event_question(self):
+        return u'<a href="/deleteEventQuestion/?optionId=%d">Delete</a>' % (self.id)
+    delete_event_question.allow_tags = True
+
+
 class EventOption(models.Model):
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten", default=0)
@@ -119,24 +137,6 @@ class EventOption(models.Model):
                 return True
         return False
     limit_reached.boolean = True
-
-
-class EventQuestion(models.Model):
-    name = models.CharField(max_length=64)
-    help = models.CharField(max_length=1024, blank=True)
-    question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
-    required = models.BooleanField(default=False)
-    event = models.ForeignKey(Event)
-
-    def __unicode__(self):
-        return u"%s (%s)" % (self.name, self.question_type)
-
-    def form_id(self):
-        return "q%d" % (self.id)
-
-    def delete_event_question(self):
-        return u'<a href="/deleteEventQuestion/?optionId=%d">Delete</a>' % (self.id)
-    delete_event_question.allow_tags = True
 
 
 class Answer(models.Model):
