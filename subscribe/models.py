@@ -145,7 +145,6 @@ class Registration(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
     event = models.ForeignKey(Event)
-    answers = models.ManyToManyField('Answer', null=True)
     payed = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
@@ -196,6 +195,8 @@ class Registration(models.Model):
 
 
 class Answer(models.Model):
+    # This should maybe be a "through" model
+    registration = models.ForeignKey(Registration, related_name='answers')
     question = models.ForeignKey(EventQuestion)
     int_field = models.IntegerField(default=0, null=True)
     txt_field = models.CharField(max_length=256, blank=True)

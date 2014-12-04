@@ -61,10 +61,8 @@ def fill_subscription(form, event):
     reg.save()
 
     for question in event.eventquestion_set.all():
-        ans = Answer(question=question)
+        ans = Answer(registration=reg, question=question)
         ans.set_answer(form.cleaned_data[question.form_id()])
         ans.save()
-        reg.answers.add(ans)
 
-    reg.save()
     return reg
