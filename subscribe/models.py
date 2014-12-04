@@ -45,25 +45,6 @@ QUESTION_TYPES = (
 )
 
 
-class MultiChoiceQuestion(models.Model):
-    name = models.CharField(max_length=256, blank=False, default='')
-    required = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        return self.name
-
-
-class MultiChoiceAnswer(models.Model):
-    name = models.CharField(max_length=256, blank=False, default='')
-    question = models.ForeignKey(MultiChoiceQuestion, blank=True, default='')
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['name']
-
-
 class Event(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField()
@@ -75,7 +56,6 @@ class Event(models.Model):
 {{voornaam}}, {{achternaam}}, {{inschrijf_opties}}
     """)
     price = models.IntegerField(help_text="Eurocenten", default=0)
-    multi_choice_questions = models.ManyToManyField(MultiChoiceQuestion, blank=True, default='')
 
     class Meta:
         ordering = ('-end_registration',)
@@ -205,7 +185,6 @@ class Registration(models.Model):
     event_options = models.ManyToManyField(EventOption, related_name='event_options')
     event = models.ForeignKey(Event)
     answers = models.ManyToManyField(Answer, null=True)
-    multi_choice_answers = models.ManyToManyField(MultiChoiceAnswer, null=True)
     payed = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)

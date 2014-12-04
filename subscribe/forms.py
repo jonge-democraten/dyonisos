@@ -16,7 +16,6 @@
 from django import forms
 
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
-from subscribe.models import MultiChoiceAnswer
 
 
 class SubscribeForm(forms.Form):
@@ -41,10 +40,6 @@ class SubscribeForm(forms.Form):
                 self.fields[name] = forms.BooleanField(label=question.name, required=question.required)
             elif question.question_type == "CHOICE":
                 self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.all())
-
-        # The multiple choice questions
-        for choiceQuestion in event.multi_choice_questions.all():
-            self.fields[choiceQuestion.name] = forms.ModelChoiceField(queryset=MultiChoiceAnswer.objects.filter(question=choiceQuestion))
 
         # Clean the options that have reached their limit
         open_options_ids = []
@@ -84,9 +79,6 @@ def fill_subscription(form, event):
         ans.set_answer(form.cleaned_data[question.form_id()])
         ans.save()
         reg.answers.add(ans)
-
-    for multiQuestion in event.multi_choice_questions.all():
-        reg.multi_choice_answers.add(form.cleaned_data[multiQuestion.name])
 
     reg.save()
     return reg

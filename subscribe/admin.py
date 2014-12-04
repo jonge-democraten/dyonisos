@@ -13,8 +13,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 from subscribe.models import Registration, IdealIssuer
-from subscribe.models import Event, EventQuestion, EventOption, MultiChoiceAnswer, RegistrationLimit
-from subscribe.models import MultiChoiceQuestion, Answer
+from subscribe.models import Event, EventQuestion, EventOption, RegistrationLimit
+from subscribe.models import Answer
 from django.contrib import admin
 from django.http import HttpResponse
 
@@ -51,12 +51,6 @@ def export_events(eventadmin, request, queryset):
             s.write(0, col_count, question.name)
             col_count += 1
 
-        mq_to_col = {}
-        for multiQuestion in event.multi_choice_questions.all():
-            mq_to_col[multiQuestion.id] = col_count
-            s.write(0, col_count, multiQuestion.name)
-            col_count += 1
-
         # Write the data
         row = 1
         for reg in event.registration_set.all():
@@ -72,9 +66,6 @@ def export_events(eventadmin, request, queryset):
 
             for ans in reg.answers.all():
                 s.write(row, q_to_col[ans.question.id], ans.get_answer())
-
-            for multiAns in reg.multi_choice_answers.all():
-                s.write(row, mq_to_col[multiAns.question.id], multiAns.name)
 
             row += 1
 
@@ -132,7 +123,6 @@ class EventAdmin(admin.ModelAdmin):
                 'description', 'price',
             ]}),
         ("Email", {"fields": ["contact_email", "email_template"]}),
-        ("Multiple choice questions", {'fields': ['multi_choice_questions']}),
     ]
     prepopulated_fields = {'slug': ('name',)}
     date_hierarchy = 'end_registration'
@@ -153,19 +143,6 @@ class RegistrationAdmin(admin.ModelAdmin):
     search_fields = ["first_name", "last_name"]
 
 
-class MultiChoiceAnswerInline(admin.TabularInline):
-    model = MultiChoiceAnswer
-    extra = 1
-    fields = ['name', 'question', ]
-
-
-class MultiChoiceQuestionAdmin(admin.ModelAdmin):
-    model = MultiChoiceQuestion
-    fields = ['name', 'required', ]
-    list_display = ['name', 'required', ]
-    inlines = [MultiChoiceAnswerInline]
-
-
 class IdealIssuerAdmin(admin.ModelAdmin):
     model = IdealIssuer
     list_display = ['issuer_id', 'name']
@@ -176,7 +153,6 @@ class EventOptionAdmin(admin.ModelAdmin):
     list_filter = ['active', 'event']
 
 
-admin.site.register(MultiChoiceQuestion, MultiChoiceQuestionAdmin)
 admin.site.register(EventQuestion)
 admin.site.register(Event, EventAdmin)
 admin.site.register(EventOption, EventOptionAdmin)
