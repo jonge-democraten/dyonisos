@@ -34,7 +34,7 @@ class SubscribeForm(forms.Form):
         self.fields["email"] = forms.EmailField(required=True, label="Email")
 
         # The dynamic fields
-        for question in event.eventquestion_set.all():
+        for question in event.eventquestion_set.order_by('order'):
             name = question.form_id()
             if question.question_type == "INT":
                 self.fields[name] = forms.IntegerField(label=question.name, required=question.required)
