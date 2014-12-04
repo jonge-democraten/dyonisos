@@ -78,7 +78,7 @@ class Event(models.Model):
         """Are all event options free?"""
         if self.price != 0:
             return False
-        if self.eventoption_set.filter(price__gt=0):
+        if len(EventOption.objects.filter(price__gt=0).filter(question__event=self)):
             return False
         return True
 
