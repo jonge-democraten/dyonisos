@@ -254,7 +254,6 @@ class IdealIssuer(models.Model):
     issuer_id = models.IntegerField()
     update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=128)
-    list_type = models.CharField(max_length=128)
 
     def __unicode__(self):
         return self.name
