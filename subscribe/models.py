@@ -54,6 +54,7 @@ class Event(models.Model):
     contact_email = models.EmailField()
     email_template = models.TextField(help_text="Enkele placeholders: {{voornaam}}, {{achternaam}}, {{inschrijf_opties}}")
     price = models.IntegerField(help_text="Eurocenten", default=0)
+    max_registrations = models.IntegerField(default=0, help_text="Als groter dan 0, bepaalt maximaal aantal inschrijvingen")
 
     class Meta:
         ordering = ('-end_registration',)
@@ -68,7 +69,7 @@ class Event(models.Model):
         return len(Registration.objects.filter(event=self).filter(payed=True))
 
     def total_payed(self):
-        return u"\u20AC %.2f" % (sum([e.price for e in self.registration_set.filter(payed=True)]) / 100.)
+        return u"\u20AC %.2f" % (sum([e.price for e in self.registrations.filter(payed=True)]) / 100.)
 
     def form_link(self):
         return "<a href=\"https://events.jongedemocraten.nl/inschrijven/%s/\">Inschrijven</a>" % (self.slug)
@@ -91,6 +92,20 @@ class Event(models.Model):
 
     def price_str(self):
         return u"\u20AC %.2f" % (float(self.price) / 100)
+
+    def is_full(self):
+        if self.max_registrations <= 0:
+            return False
+        return self.registrations.count() >= self.max_registrations
+    is_full.boolean = True
+
+    def get_registrations_over_limit(self):
+        results = []
+        if self.max_registrations > 0:
+            results += self.registrations.order_by('pk')[int(self.max_registrations):]
+        for limit in self.registrationlimit_set.all():
+            results += limit.get_registrations_over_limit()
+        return results
 
 
 class EventQuestion(models.Model):
@@ -149,13 +164,17 @@ class RegistrationLimit(models.Model):
     def __unicode__(self):
         return u'Limiet: %d (%s)' % (self.limit, self.description)
 
-    def get_num_registrations(self):
-        registrations = Registration.objects.filter(answers__option__in=self.options.all())
-        return registrations.count()
+    def get_related_registrations(self):
+        return Registration.objects.filter(answers__option__in=self.options.all()).order_by('pk')
 
     def is_reached(self):
-        return self.get_num_registrations() >= self.limit
+        registrations = self.get_related_registrations()
+        return registrations.count() >= self.limit
     is_reached.boolean = True
+
+    def get_registrations_over_limit(self):
+        registrations = self.get_related_registrations()
+        return registrations[int(self.limit):]
 
 
 class Registration(models.Model):
@@ -163,7 +182,7 @@ class Registration(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(blank=True)
-    event = models.ForeignKey(Event)
+    event = models.ForeignKey(Event, related_name='registrations')
     price = models.IntegerField(default=0)
     payed = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)

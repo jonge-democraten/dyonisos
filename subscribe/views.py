@@ -42,6 +42,8 @@ def register(request, slug):
     now = datetime.datetime.now()
     if event.start_registration > now or event.end_registration < now:
         return HttpResponse(_("Inschrijving gesloten."))
+    if event.is_full():
+        return HttpResponse(_("Helaas is het maximum aantal inschrijvingen bereikt."))
     # SubscribeForm = SubscribeFormBuilder(event)
     if request.method == "POST":
         logger.info('views::register() - form POST')
@@ -55,6 +57,14 @@ def register(request, slug):
         elif valid:
             # Store the data
             subscription = fill_subscription(form, event)
+            if subscription in event.get_registrations_over_limit():
+                subscription.delete()
+                if event.is_full():
+                    error_str = "De inschrijving kan niet worden voltooid, omdat het maximum aantal inschrijvingen is bereikt."
+                else:
+                    error_str = "De inschrijving kan niet worden voltooid, omdat een van de gekozen opties het maximum aantal inschrijvingen heeft bereikt."
+                logger.error(error_str)
+                return HttpResponse(_(error_str))
             if not subscription:
                 # Error Filling subscription
                 error_str = "Error in saving form."

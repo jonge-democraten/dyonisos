@@ -47,7 +47,7 @@ def export_events(eventadmin, request, queryset):
 
         # Write the data
         row = 1
-        for reg in event.registration_set.all():
+        for reg in event.registrations.all():
             s.write(row, 0, reg.first_name)
             s.write(row, 1, reg.last_name)
             s.write(row, 2, reg.email)
@@ -102,7 +102,7 @@ class EventAdmin(admin.ModelAdmin):
             'fields': [
                 ('name', 'slug'),
                 ('start_registration', 'end_registration'),
-                'description', 'price',
+                'description', 'price', 'max_registrations',
             ]}),
         ("Email", {"fields": ["contact_email", "email_template"]}),
     ]
@@ -110,7 +110,7 @@ class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'end_registration'
     inlines = [EventQuestionInline, RegistrationLimitInline]
     actions = [export_events, ]  # XXX: export
-    list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'start_registration', 'end_registration']
+    list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'is_full', 'start_registration', 'end_registration']
     search_fields = ["name", ]
 
 
