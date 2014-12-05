@@ -18,7 +18,7 @@
 {% endif %}
 {% endfor %}
 {% if not form.preview %}
-<div class='submit'><input class="button" type="submit" value="Doorgaan!" /></div>
+<div class='submit'><input class="button" type="submit" value="Doorgaan!" onclick="this.disabled=true,this.form.submit()" /></div>
 {% endif %}
 </div>
 {% endif %}
@@ -34,7 +34,7 @@ Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?sub
 <p>Het is gratis!</p>
 {% endif %}
 <input type='hidden' id='registration_preview' name='registration_preview' value='1'>
-<div class='submit'><input class="button" type="submit" value="Inschrijven!" /></div>
+<div class='submit'><input class="button" type="submit" value="Inschrijven!" onclick="this.disabled=true,this.form.submit()" /></div>
 </div>
 {% endif %}
 
