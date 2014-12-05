@@ -1,42 +1,42 @@
-{% load staticfiles %}
-
 <!doctype html>
+{% load staticfiles %}
 <html lang="nl">
 
 <head>
   <meta charset="utf-8">
   <title>Inschrijven {{event.name}}</title>
-  
   <link rel="stylesheet" href="{% static "subscribe/signup_form.css" %}">
 </head>
 
-
 <body>
-  <div>
-    <a href="/"><img src="https://jongedemocraten.nl/templates/jd/images/Logo.png" border="0" /></a>
-  </div>
+<div id="container">
+<div><a href="/"><img src="https://jongedemocraten.nl/templates/jd/images/Logo.png" border="0" /></a></div>
   
-  <h1>Inschrijven voor {{event.name}}</h1>
-  <div style="max-width:800px;">
-    <form method="POST" action="/inschrijven/{{event.slug}}/">
-    {% csrf_token %}
-    <table style="width:100%;">
-      {{ form }}
-{% if event.price %}
-      <tr><th><strong>Basisbedrag:</strong></th><td>{{ event.price_str }}</td></tr>
+<div class="formpart">
+<div class="title">Inschrijven voor {{event.name}}</div>
+<form method="POST" action="/inschrijven/{{event.slug}}/">{% csrf_token %}
+{{ form.media }}{# form.as_p #}
+{{ form.non_field_errors }}
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+{% for field in form.visible_fields %}
+{% if field.field.is_checkbox %}
+<div class='checkbox'>{{ field }}{{ field.label_tag}}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
+{% else %}
+<div class='question'>{{ field.label_tag}}{{ field }}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
 {% endif %}
-    </table>
-      <input type="submit" value="Inschrijven!">
-    </form>
-  </div>
+{% endfor %}
+<div class='submit'><input class="button" type="submit" value="Doorgaan!" /></div>
+</form>
+</div>
 
-  <div id="description">{{event.description|safe}}</div>
-  <div id="description">
-	  Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser
-	  niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. 
-    <br>Neem bij problemen contact op met het
-	  <a href="mailto:ict@jongedemocraten.nl?subject=iDEAL%20betaalfout">ICT-team</a>.
-  </div>
+<div class="formpart">{{event.description|safe}}</div>
+<div class="formpart">
+  Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser
+  niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. 
+  <br>
+  Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?subject=iDEAL%20betaalfout">ICT-team</a>.
+</div>
+</div>
 </body>
 
 </html>

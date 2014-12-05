@@ -19,6 +19,9 @@ from django.db import transaction
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
 
 
+setattr(forms.fields.Field, 'is_checkbox', lambda self: isinstance(self.widget, forms.CheckboxInput))
+
+
 class SubscribeForm(forms.Form):
     def __init__(self, event, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
