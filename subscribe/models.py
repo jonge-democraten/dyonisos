@@ -232,6 +232,8 @@ class Answer(models.Model):
             self.bool_field = ans
             if self.bool_field and len(self.question.options.all()):
                 self.option = self.question.options.all()[0]
+            else:
+                self.option = None
         elif self.question.question_type == "CHOICE":
             self.option = ans
 
@@ -243,7 +245,10 @@ class Answer(models.Model):
         elif self.question.question_type == "AFD":
             return self.txt_field
         elif self.question.question_type == "BOOL":
-            return self.bool_field
+            if self.option is not None:
+                return self.option
+            else:
+                return self.bool_field
         elif self.question.question_type == "CHOICE":
             return self.option
 
