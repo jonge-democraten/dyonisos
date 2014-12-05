@@ -1,17 +1,5 @@
-<!doctype html>
-{% load staticfiles %}
-<html lang="nl">
-
-<head>
-  <meta charset="utf-8">
-  <title>Inschrijven {{event.name}}</title>
-  <link rel="stylesheet" href="{% static "subscribe/signup_form.css" %}">
-</head>
-
-<body>
-<div id="container">
-<div><a href="/"><img src="https://jongedemocraten.nl/templates/jd/images/Logo.png" border="0" /></a></div>
-  
+{% extends 'subscribe/base_event.html' %}
+{% block content %}
 <form method="POST" action="/inschrijven/{{event.slug}}/">{% csrf_token %}
 {% if form.preview %}
 {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
@@ -52,7 +40,4 @@ Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?sub
 
 <div class="formpart">{{event.description|safe}}</div>
 </form>
-</div>
-</body>
-
-</html>
+{% endblock %}

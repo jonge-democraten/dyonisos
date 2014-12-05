@@ -34,6 +34,11 @@ def _safe_string(s, max_len=32):
     return filter(lambda c: c in safe, s)[:max_len]
 
 
+def event_message(request, event, message):
+    c = {"event": event, "request": request, "message": message}
+    return render_to_response("subscribe/event_message.html", c)
+
+
 def register(request, slug):
     logger = logging.getLogger(__name__)
 
@@ -41,9 +46,9 @@ def register(request, slug):
     event = get_object_or_404(Event, slug=slug)
     now = datetime.datetime.now()
     if event.start_registration > now or event.end_registration < now:
-        return HttpResponse(_("Inschrijving gesloten."))
+        return event_message(request, event, _("Inschrijving gesloten."))
     if event.is_full():
-        return HttpResponse(_("Helaas is het maximum aantal inschrijvingen bereikt."))
+        return event_message(request, event, _("Helaas is het maximum aantal inschrijvingen bereikt."))
     # SubscribeForm = SubscribeFormBuilder(event)
     if request.method == "POST":
         logger.info('views::register() - form POST')
@@ -64,7 +69,7 @@ def register(request, slug):
                 else:
                     error_str = "De inschrijving kan niet worden voltooid, omdat een van de gekozen opties het maximum aantal inschrijvingen heeft bereikt."
                 logger.error(error_str)
-                return HttpResponse(_(error_str))
+                return event_message(request, event, _(error_str))
             if not subscription:
                 # Error Filling subscription
                 error_str = "Error in saving form."
@@ -75,7 +80,7 @@ def register(request, slug):
                 subscription.send_confirmation_email()
                 subscription.save()
                 logger.info('views::register() - registered for a free event.')
-                return HttpResponse(_("Inschrijving geslaagd. Ter bevestiging is een e-mail verstuurd."))
+                return event_message(request, event, _("Inschrijving geslaagd. Ter bevestiging is een e-mail verstuurd."))
 
             # You need to pay
             response = mollie.fetch(
@@ -92,7 +97,7 @@ def register(request, slug):
             if err:
                 error_str = "views::register() - Technische fout, probeer later opnieuw." + "\n\n%d: %s" % (err[0], err[1])
                 logger.error(error_str)
-                return HttpResponse(_(error_str))
+                return event_message(request, event, _(error_str))
 
             subscription.trxid = response.order.transaction_id
             subscription.save()
@@ -129,17 +134,17 @@ def return_page(request):
         subscription = Registration.objects.get(trxid=transaction_id)
 
     if subscription.payed and subscription.status == "Success":
-        return HttpResponse(_("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
+        return event_message(request, subscription.event, _("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
     elif subscription.status == "Cancelled":
-        return HttpResponse(_("Je betaling is geannuleerd."))
+        return event_message(request, subscription.event, _("Je betaling is geannuleerd."))
     elif subscription.status == "Failure":
-        return HttpResponse(_("Je betaling is om onbekende reden niet gelukt. Er is geen geld afgeschreven. Neem contact op met ict@jongedemocraten.nl of probeer het nogmaals."))
+        return event_message(request, subscription.event, _("Je betaling is om onbekende reden niet gelukt. Er is geen geld afgeschreven. Neem contact op met ict@jongedemocraten.nl of probeer het nogmaals."))
     elif subscription.status == "Expired":
-        return HttpResponse(_("Je betaling is geannuleerd."))
+        return event_message(request, subscription.event, _("Je betaling is geannuleerd."))
     elif subscription.status == "Open":
-        return HttpResponse(_("Je betaling staat geregistreerd in ons systeem, maar wordt nog verwerkt door onze bank. Als je binnen een uur geen bevestigingsmail ontvangt, is er mogelijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
+        return event_message(request, subscription.event, _("Je betaling staat geregistreerd in ons systeem, maar wordt nog verwerkt door onze bank. Als je binnen een uur geen bevestigingsmail ontvangt, is er mogelijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
     else:
-        return HttpResponse(_("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+        return event_message(request, subscription.event, _("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
 def check(request):
