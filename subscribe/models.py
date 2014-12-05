@@ -68,7 +68,7 @@ class Event(models.Model):
         return len(Registration.objects.filter(event=self).filter(payed=True))
 
     def total_payed(self):
-        return u"\u20AC %.2f" % (sum([e.price for e in self.registraton_set.filter(payed=True)]) / 100.)
+        return u"\u20AC %.2f" % (sum([e.price for e in self.registration_set.filter(payed=True)]) / 100.)
 
     def form_link(self):
         return "<a href=\"https://events.jongedemocraten.nl/inschrijven/%s/\">Inschrijven</a>" % (self.slug)
@@ -230,7 +230,7 @@ class Answer(models.Model):
             self.txt_field = ans
         elif self.question.question_type == "BOOL":
             self.bool_field = ans
-            if len(self.question.options.all()):
+            if self.bool_field and len(self.question.options.all()):
                 self.option = self.question.options.all()[0]
         elif self.question.question_type == "CHOICE":
             self.option = ans

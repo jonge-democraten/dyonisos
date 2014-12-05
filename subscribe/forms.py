@@ -24,7 +24,14 @@ setattr(forms.fields.Field, 'is_checkbox', lambda self: isinstance(self.widget, 
 
 class SubscribeForm(forms.Form):
     def __init__(self, event, *args, **kwargs):
+        if len(args) and 'registration_preview' in args[0]:
+            self.preview = True
+        else:
+            self.preview = False
+
         super(SubscribeForm, self).__init__(*args, **kwargs)
+
+        self.event = event
 
         # Check the limits
         closed_options = []
@@ -57,9 +64,58 @@ class SubscribeForm(forms.Form):
             elif question.question_type == "CHOICE":
                 self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False))
 
-        # Only show bank choice if at least one of the options costs money
-        if not event.all_free():
-            self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)")
+            self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
+
+    def is_valid(self):
+        res = super(SubscribeForm, self).is_valid()
+        if not res:
+            return False
+        if self.preview:
+            self.confirm_page()
+            self.full_clean()
+            res = super(SubscribeForm, self).is_valid()
+        return res
+
+    def confirm_page(self):
+        self.preview = True
+
+        for f in self.fields:
+            self.fields[f].widget.attrs['readonly'] = True
+
+        str = u'<table><tr><th>Omschrijving</th><th>Bedrag</th></tr>'
+        price = self.event.price
+        if price != 0:
+            str += u'<tr><td>Standaard:</td><td>\u20AC {:.2f}</td></tr>'.format(float(price) / 100.)
+        for question in self.event.eventquestion_set.order_by('order'):
+            if question.question_type == 'CHOICE':
+                option = self.cleaned_data[question.form_id()]
+                if option is not None:
+                    if option.price != 0:
+                        price += option.price
+                        str += u'<tr><td>{}</td><td>\u20AC {:.2f}</td></tr>'.format(option.name, float(option.price) / 100.)
+            if question.question_type == 'BOOL':
+                if self.cleaned_data[question.form_id()]:
+                    option = list(question.options.all()[:1])
+                    if option:
+                        option = option[0]
+                        if option.price != 0:
+                            price += option.price
+                            str += u'<tr><td>{}</td><td>\u20AC {:.2f}</td></tr>'.format(option.name, float(option.price) / 100.)
+        str += u'<tr><td><strong>Totaal:</strong></td><td><strong>\u20AC {:.2f}</strong></td></tr>'.format(float(price) / 100.)
+        str += u'</table>'
+        self.price = price
+        self.price_description = str
+
+        if self.price > 0:
+            self.fields['issuer'].required = True
+
+    def visible_fields(self):
+        fields = [f for f in self.fields if not f == 'issuer']
+        fields = [self[f] for f in fields]
+        return [field for field in fields if not field.is_hidden]
+
+    def issuer_field(self):
+        return self['issuer']
 
 
 @transaction.atomic

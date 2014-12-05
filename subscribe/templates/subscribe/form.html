@@ -12,9 +12,13 @@
 <div id="container">
 <div><a href="/"><img src="https://jongedemocraten.nl/templates/jd/images/Logo.png" border="0" /></a></div>
   
+<form method="POST" action="/inschrijven/{{event.slug}}/">{% csrf_token %}
+{% if form.preview %}
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+{% for field in form.visible_fields %}{{ field.as_hidden }}{% endfor %}
+{% else %}
 <div class="formpart">
 <div class="title">Inschrijven voor {{event.name}}</div>
-<form method="POST" action="/inschrijven/{{event.slug}}/">{% csrf_token %}
 {{ form.media }}{# form.as_p #}
 {{ form.non_field_errors }}
 {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
@@ -25,17 +29,29 @@
 <div class='question'>{{ field.label_tag}}{{ field }}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
 {% endif %}
 {% endfor %}
+{% if not form.preview %}
 <div class='submit'><input class="button" type="submit" value="Doorgaan!" /></div>
-</form>
+{% endif %}
 </div>
+{% endif %}
+
+{% if form.preview %}
+<div class="kosten formpart"><h3>Kosten</h3>
+{% if form.price %}
+{{form.price_description|safe}}
+<div class='question'>{{ form.issuer_field.label_tag}}{{ form.issuer_field }}{% for error in form.issuer_field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
+<div style="margin-top:1em;">Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. <br />
+Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?subject=iDEAL%20betaalfout">ICT-team</a>.</div>
+{% else %}
+<p>Het is gratis!</p>
+{% endif %}
+<input type='hidden' id='registration_preview' name='registration_preview' value='1'>
+<div class='submit'><input class="button" type="submit" value="Inschrijven!" /></div>
+</div>
+{% endif %}
 
 <div class="formpart">{{event.description|safe}}</div>
-<div class="formpart">
-  Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser
-  niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. 
-  <br>
-  Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?subject=iDEAL%20betaalfout">ICT-team</a>.
-</div>
+</form>
 </div>
 </body>
 

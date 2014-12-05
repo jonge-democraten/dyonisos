@@ -46,7 +46,13 @@ def register(request, slug):
     if request.method == "POST":
         logger.info('views::register() - form POST')
         form = SubscribeForm(event, request.POST)
-        if form.is_valid():
+        valid = form.is_valid()
+        if valid and 'registration_preview' not in request.POST:
+            form.confirm_page()
+            c = {"event": event, "request": request, "form": form}
+            c.update(csrf(request))
+            return render_to_response("subscribe/form.html", c)
+        elif valid:
             # Store the data
             subscription = fill_subscription(form, event)
             if not subscription:

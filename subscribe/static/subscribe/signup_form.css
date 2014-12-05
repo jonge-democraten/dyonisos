@@ -15,7 +15,7 @@ body { background: #eee; }
 
 label { font-weight: bold; font-size: 90%; }
 label:hover { text-decoration: underline; }
-form div:hover { background-color: #f4f4f4; } 
+.formpart div:hover { background-color: #f4f4f4; }
 
 input[type="submit"] {
   background: #578439 url('https://jongedemocraten.nl/templates/jd/images/TitleBackground.png'); background-repeat: repeat-x;
@@ -40,3 +40,4 @@ textarea { width: 30em; }
 
 ol.terms { list-style-position: outside; margin-left: 1.5em; list-style-type: lower-alpha; }
 
+.kosten tr th:first-child, .kosten tr td:first-child { min-width: 360px; text-align: left; }
