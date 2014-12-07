@@ -1,42 +1,19 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <title>JD Evenementen</title>
-  <link rel="stylesheet" type="text/css" href="https://jongedemocraten.nl/templates/jd/css/template.css">
-
-  <style>
-    .container { width: 605px; margin: 30px auto; }
-    th, td { padding-left: 10px; padding-right: 10px; }
-  </style>
-
-</head>
-
-<body>
-
-<div class="container">
-  <div>
-    <a href="/"><img src="https://jongedemocraten.nl/templates/jd/images/Logo.png" border="0" /></a>
-  </div>
-  <div>
-    <h2>Evenementen</h2>
-  </div>
-
-  <div>
-    {% if events %}
-      {% for event in events %}
-        <h2><a href="inschrijven/{{ event.slug }}">{{ event.name }}</a></h2> 
-      {% endfor %}
-    {% else %}
-      Er zijn op dit moment geen evenementen om je voor in te schrijven.
-    {% endif %}
-  </div>
-  <hr> 
-  <div>
-    <h3> <a href="admin/">Admin </a> </h3>
-  </div>
+{% extends 'subscribe/base.html' %}
+{% block title %}JD Evenementen{% endblock %}
+{% block content %}
+{% if user.is_staff %}
+<div class='formpart'><p><a href="admin/">Admin pagina </a></p></div>
+{% endif %}
+<div class='formpart'>
+  <div class='title'>Evenementen</h3>
+  {% if events %}
+  <ul style="margin-top: 1em;">
+  {% for event in events %}
+    <li><a href="inschrijven/{{ event.slug }}">{{ event.name }}</a> (deadline: {{ event.end_registration }})</li> 
+  {% endfor %}
+  </ul>
+  {% else %}
+    Er zijn op dit moment geen evenementen om je voor in te schrijven.
+  {% endif %}
 </div>
- 
-</body>
-
-</html> 
+{% endblock %}
