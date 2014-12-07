@@ -45,19 +45,19 @@ class SubscribeForm(forms.Form):
             if limit.is_reached():
                 closed_options += [o.pk for o in limit.options.all()]
 
-        # First the mandatory fields
-        self.fields["first_name"] = forms.CharField(max_length=64, required=True, label="Voornaam")
-        self.fields["last_name"] = forms.CharField(max_length=64, required=True, label="Achternaam")
-        self.fields["email"] = forms.EmailField(required=True, label="Email")
-
         self._elements = []
-
-        self._elements += [('field', 'first_name')]
-        self._elements += [('field', 'last_name')]
-        self._elements += [('field', 'email')]
+        inserted_default_fields = False
 
         # The dynamic fields
         for question in event.eventquestion_set.order_by('order'):
+            if question.order >= 0 and not inserted_default_fields:
+                self.fields["first_name"] = forms.CharField(max_length=64, required=True, label="Voornaam")
+                self._elements += [('field', 'first_name')]
+                self.fields["last_name"] = forms.CharField(max_length=64, required=True, label="Achternaam")
+                self._elements += [('field', 'last_name')]
+                self.fields["email"] = forms.EmailField(required=True, label="Email")
+                self._elements += [('field', 'email')]
+                inserted_default_fields = True
             name = question.form_id()
             if question.question_type == "INT":
                 self.fields[name] = forms.IntegerField(label=question.name, required=question.required)
