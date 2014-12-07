@@ -21,7 +21,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.views.generic.list import ListView
 
 from subscribe.models import Event, EventQuestion
 from subscribe.forms import Registration, SubscribeForm, fill_subscription
@@ -45,10 +45,11 @@ def register(request, slug):
     logger.info('views::register() - start')
     event = get_object_or_404(Event, slug=slug)
     now = datetime.datetime.now()
-    if event.start_registration > now or event.end_registration < now:
-        return event_message(request, event, _("Inschrijving gesloten."))
-    if event.is_full():
-        return event_message(request, event, _("Helaas is het maximum aantal inschrijvingen bereikt."))
+    if not request.user.is_staff:
+        if event.start_registration > now or event.end_registration < now:
+            return event_message(request, event, _("Inschrijving gesloten."))
+        if event.is_full():
+            return event_message(request, event, _("Helaas is het maximum aantal inschrijvingen bereikt."))
     # SubscribeForm = SubscribeFormBuilder(event)
     if request.method == "POST":
         logger.info('views::register() - form POST')
@@ -194,18 +195,14 @@ def delete_event_question(request):
                                  <a href="/admin/">Nee</a>""" % (int(questionId), 0)))
 
 
-class HomeView(TemplateView):
+class HomeView(ListView):
+    model = Event
+    queryset = Event.objects.order_by('-end_registration', '-start_registration')
     template_name = "subscribe/index.html"
-    context_object_name = "index"
+    context_object_name = "events"
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(HomeView, self).get_context_data(**kwargs)
-        events = Event.objects.all()
-        eventsOpen = []
-        for event in events:
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
             now = datetime.datetime.now()
-            if (event.start_registration < now and event.end_registration > now):
-                eventsOpen.append(event)
-        context['events'] = eventsOpen
-        return context
+            self.queryset = self.queryset.filter(start_registration__lte=now, end_registration__gte=now)
+        return super(HomeView, self).get(self, request, *args, **kwargs)
