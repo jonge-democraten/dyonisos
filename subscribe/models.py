@@ -143,9 +143,9 @@ class EventOption(models.Model):
 
     def __unicode__(self):
         if self.price < 0:
-            return u"%s - \u20AC %.2f korting" % (self.name, float(-self.price) / 100)
+            return u"%s: \u20AC %.2f korting" % (self.name, float(-self.price) / 100)
         if self.price > 0:
-            return u"%s - \u20AC %.2f" % (self.name, float(self.price) / 100)
+            return u"%s: \u20AC %.2f" % (self.name, float(self.price) / 100)
         else:
             return u"%s" % (self.name,)
 

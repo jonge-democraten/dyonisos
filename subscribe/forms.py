@@ -77,9 +77,9 @@ class SubscribeForm(forms.Form):
                 options = question.options.all()
                 if len(options) and options[0].price != 0:
                     if options[0].price < 0:
-                        label = u"%s - \u20AC %.2f korting" % (question.name, float(-options[0].price) / 100)
+                        label = u"%s: \u20AC %.2f korting" % (question.name, float(-options[0].price) / 100)
                     else:
-                        label = u"%s - \u20AC %.2f" % (question.name, float(options[0].price) / 100)
+                        label = u"%s: \u20AC %.2f" % (question.name, float(options[0].price) / 100)
                 else:
                     label = question.name
                 self.fields[name] = forms.BooleanField(label=label, required=question.required)
