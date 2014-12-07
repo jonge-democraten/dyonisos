@@ -58,9 +58,15 @@ def register(request, slug):
         if valid and 'registration_preview' not in request.POST:
             form.confirm_page()
             c = {"event": event, "request": request, "form": form}
+            c['user_is_staff'] = request.user.is_staff
             c.update(csrf(request))
             return render_to_response("subscribe/form.html", c)
         elif valid:
+            if 'testsubmit' in request.POST:
+                subscription = fill_subscription(form, event)
+                subscription.send_confirmation_email()
+                subscription.delete()
+                return event_message(request, event, _("Een test-email is verstuurd."))
             # Store the data
             subscription = fill_subscription(form, event)
             if subscription in event.get_registrations_over_limit():
@@ -108,11 +114,8 @@ def register(request, slug):
 
     else:
         form = SubscribeForm(event)
-    c = {
-        "event": event,
-        "request": request,
-        "form": form,
-    }
+    c = {"event": event, "request": request, "form": form, }
+    c['user_is_staff'] = request.user.is_staff
     c.update(csrf(request))
     return render_to_response("subscribe/form.html", c)
 

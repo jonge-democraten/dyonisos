@@ -42,6 +42,9 @@ Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?sub
 {% endif %}
 <input type='hidden' id='registration_preview' name='registration_preview' value='1'>
 <div class='submit'><input class="button" type="submit" value="Inschrijven!" onclick="this.disabled=true,this.form.submit()" /></div>
+{% if user_is_staff %}
+<div class='submit'><input class="button" type="submit" name="testsubmit" value="Test-email versturen!" /></div>
+{% endif %}
 </div>
 {% endif %}
 
