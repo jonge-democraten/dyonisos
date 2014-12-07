@@ -10,11 +10,18 @@
 {{ form.media }}{# form.as_p #}
 {{ form.non_field_errors }}
 {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-{% for field in form.visible_fields %}
-{% if field.field.is_checkbox %}
+
+{% for element_type, element_value in form.elements %}
+{% if element_type == "text" %}
+<div class='text'>{{ element_value }}</div>
+{% elif element_type == "field" %}
+  {% with field=element_value %}
+  {% if field.field.is_checkbox %}
 <div class='checkbox'>{{ field }}{{ field.label_tag}}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
-{% else %}
+  {% else %}
 <div class='question'>{{ field.label_tag}}{{ field }}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
+  {% endif %}
+  {% endwith %}
 {% endif %}
 {% endfor %}
 {% if not form.preview %}

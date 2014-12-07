@@ -10,7 +10,7 @@ body { background: #eee; }
 .formpart { border: 1px solid #ddd; box-shadow: 0px 0px 1px 0px #578439; }
 .formpart h3, .formpart .title { margin: 0 0 1em 0; }
 .formpart h3, .formpart .title { font-weight: bold; font-size: 16px; letter-spacing: 1px; color: #578439; }
-.question, .checkbox, .submit { display: block; margin: 1em 0 0 0; }
+.text, .question, .checkbox, .submit { display: block; margin: 1em 0 0 0; }
 .question label { display: block; margin-bottom: .1em; }
 
 label { font-weight: bold; font-size: 90%; }
@@ -38,6 +38,7 @@ input[type="checkbox"] { margin-right: 1em; width: auto; }
 textarea { width: 30em; }
 .error { display: inline-block; border-radius: 3px; background: #d22; color: #fff; margin-left: 1em; padding: 2px 4px; line-height: 1.2em; }
 
-ol.terms { list-style-position: outside; margin-left: 1.5em; list-style-type: lower-alpha; }
+ol { list-style-position: outside; margin-left: 1.5em; list-style-type: lower-alpha; }
+ul { list-style-position: outside; margin-left: 1.5em; }
 
 .kosten tr th:first-child, .kosten tr td:first-child { min-width: 360px; text-align: left; }

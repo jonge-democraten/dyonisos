@@ -13,8 +13,10 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
+import bleach
 from django import forms
 from django.db import transaction
+from django.utils.safestring import mark_safe
 
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
 
@@ -44,16 +46,25 @@ class SubscribeForm(forms.Form):
         self.fields["last_name"] = forms.CharField(max_length=64, required=True, label="Achternaam")
         self.fields["email"] = forms.EmailField(required=True, label="Email")
 
+        self._elements = []
+
+        self._elements += [('field', 'first_name')]
+        self._elements += [('field', 'last_name')]
+        self._elements += [('field', 'email')]
+
         # The dynamic fields
         for question in event.eventquestion_set.order_by('order'):
             name = question.form_id()
             if question.question_type == "INT":
                 self.fields[name] = forms.IntegerField(label=question.name, required=question.required)
+                self._elements += [('field', name)]
             elif question.question_type == "TXT":
                 self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required)
+                self._elements += [('field', name)]
             elif question.question_type == "AFD":
                 self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
                                                     widget=forms.Select(choices=AFDELINGEN))
+                self._elements += [('field', name)]
             elif question.question_type == "BOOL":
                 options = question.options.all()
                 if len(options) and options[0].price != 0:
@@ -61,10 +72,21 @@ class SubscribeForm(forms.Form):
                 else:
                     label = question.name
                 self.fields[name] = forms.BooleanField(label=label, required=question.required)
+                self._elements += [('field', name)]
             elif question.question_type == "CHOICE":
                 self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False))
+                self._elements += [('field', name)]
+            elif question.question_type == "TEXT":
+                allowed_tags = ['a', 'b', 'code', 'em', 'h3', 'i', 'img', 'strong', 'ul', 'ol', 'li', 'p', 'br']
+                allowed_attrs = {
+                    '*': ['class', 'style'],
+                    'a': ['href', 'target'],
+                    'img': ['src', 'alt'],
+                }
+                text = mark_safe(bleach.clean(question.text, tags=allowed_tags, attributes=allowed_attrs))
+                self._elements += [('text', text)]
 
-            self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
+        self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
 
     def is_valid(self):
         res = super(SubscribeForm, self).is_valid()
@@ -117,6 +139,15 @@ class SubscribeForm(forms.Form):
     def issuer_field(self):
         return self['issuer']
 
+    def elements(self):
+        res = []
+        for element_type, element_value in self._elements:
+            if element_type == "text":
+                res += [(element_type, element_value)]
+            elif element_type == "field":
+                res += [(element_type, self[element_value])]
+        return res
+
 
 @transaction.atomic
 def fill_subscription(form, event):
@@ -127,9 +158,10 @@ def fill_subscription(form, event):
     reg.save()
 
     for question in event.eventquestion_set.all():
-        ans = Answer(registration=reg, question=question)
-        ans.set_answer(form.cleaned_data[question.form_id()])
-        ans.save()
+        if question.form_id() in form.cleaned_data:
+            ans = Answer(registration=reg, question=question)
+            ans.set_answer(form.cleaned_data[question.form_id()])
+            ans.save()
 
     reg.calculate_price()
     reg.save()

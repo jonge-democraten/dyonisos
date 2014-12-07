@@ -38,10 +38,11 @@ AFDELINGEN = (
 
 QUESTION_TYPES = (
     ("INT", "Integer"),
-    ("TXT", "Text"),
+    ("TXT", "Text Input"),
     ("AFD", "Afdeling"),
     ("BOOL", "Ja/Nee"),
     ("CHOICE", "Multiple Choice"),
+    ("TEXT", "HTML Text"),
 )
 
 
@@ -115,6 +116,7 @@ class EventQuestion(models.Model):
     question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
     required = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
+    text = models.TextField(blank=True, default='', help_text='Geldige HTML tags: a, b/strong, code, em/i, h3, img, ul, ol, li, p, br; Geldige HTML attributen: class, style, a.href, a.target, img.src, img.alt')
 
     def __unicode__(self):
         return u"%s (%s)" % (self.name, self.question_type)

@@ -4,3 +4,4 @@ lxml==3.4.0
 pycurl==7.19.5
 wsgiref==0.1.2
 xlwt==0.7.5
+bleach
