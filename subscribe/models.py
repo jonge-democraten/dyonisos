@@ -104,6 +104,9 @@ class Event(models.Model):
         results = []
         if self.max_registrations > 0:
             results += self.registrations.order_by('pk')[int(self.max_registrations):]
+        for question in self.eventquestion_set.all():
+            for option in question.options.all():
+                results += option.get_registrations_over_limit()
         for limit in self.registrationlimit_set.all():
             results += limit.get_registrations_over_limit()
         return results
@@ -136,6 +139,7 @@ class EventOption(models.Model):
     price = models.IntegerField(help_text="Eurocenten", default=0)
     active = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
+    limit = models.IntegerField(default=0, help_text="Aantal beschikbare plekken (0 = geen limiet)")
 
     def __unicode__(self):
         if self.price < 0:
@@ -152,7 +156,26 @@ class EventOption(models.Model):
         return u'<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
     delete_event_option.allow_tags = True
 
+    def get_related_registrations(self):
+        return Registration.objects.filter(answers__option=self).order_by('pk')
+
+    def is_full(self):
+        if self.limit <= 0:
+            return False
+        registrations = self.get_related_registrations()
+        return registrations.count() >= self.limit
+    is_full.boolean = True
+
+    def get_registrations_over_limit(self):
+        if self.limit <= 0:
+            return []
+        registrations = self.get_related_registrations()
+        return registrations[int(self.limit):]
+
     def limit_reached(self):
+        # Check our own first
+        if self.is_full():
+            return True
         # Limit is reached when at least one of the registrationlimits has been reached
         for l in self.registrationlimit_set.all():
             if l.is_reached():

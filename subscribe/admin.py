@@ -117,7 +117,7 @@ class EventAdmin(admin.ModelAdmin):
 class EventOptionInline(admin.TabularInline):
     model = EventOption
     extra = 1
-    fields = ['order', 'name', 'price', 'active', ]
+    fields = ['order', 'name', 'price', 'limit', 'active', ]
     ordering = ('order',)
 
     def has_delete_permission(self, request, obj=None):
