@@ -82,9 +82,9 @@ class SubscribeForm(forms.Form):
                 self._elements += [('field', name)]
             elif question.question_type == "CHOICE":
                 if question.radio:
-                    self.fields[name] = forms.ModelChoiceField(widget=forms.RadioSelect(), label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False), empty_label=None)
+                    self.fields[name] = forms.ModelChoiceField(widget=forms.RadioSelect(), label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False).order_by('order'), empty_label=None)
                 else:
-                    self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False), empty_label=None)
+                    self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False).order_by('order'), empty_label=None)
                 self._elements += [('field', name)]
             elif question.question_type == "TEXT":
                 allowed_tags = ['a', 'b', 'code', 'em', 'h3', 'i', 'img', 'strong', 'ul', 'ol', 'li', 'p', 'br']

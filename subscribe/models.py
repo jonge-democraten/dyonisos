@@ -135,6 +135,7 @@ class EventOption(models.Model):
     name = models.CharField(max_length=200)
     price = models.IntegerField(help_text="Eurocenten", default=0)
     active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
 
     def __unicode__(self):
         if self.price < 0:
