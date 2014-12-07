@@ -68,10 +68,10 @@ class SubscribeForm(forms.Form):
             elif question.question_type == "AFD":
                 if question.radio:
                     self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
-                                                    widget=forms.RadioSelect(choices=AFDELINGEN))
+                                                        widget=forms.RadioSelect(choices=AFDELINGEN))
                 else:
                     self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
-                                                    widget=forms.Select(choices=AFDELINGEN))
+                                                        widget=forms.Select(choices=AFDELINGEN))
                 self._elements += [('field', name)]
             elif question.question_type == "BOOL":
                 options = question.options.all()
