@@ -34,11 +34,12 @@ a:hover { color: #036; }
 
 input, select { vertical-align:middle; display: inline-block;}
 input { width: 14em; }
-input[type="checkbox"] { margin-right: 1em; width: auto; }
+input[type="radio"], input[type="checkbox"] { margin-right: 1em; width: auto; }
 textarea { width: 30em; }
 .error { display: inline-block; border-radius: 3px; background: #d22; color: #fff; margin-left: 1em; padding: 2px 4px; line-height: 1.2em; }
 
-ol { list-style-position: outside; margin-left: 1.5em; list-style-type: lower-alpha; }
-ul { list-style-position: outside; margin-left: 1.5em; }
+.formpart ol { list-style-position: outside; margin-left: 1.5em; list-style-type: lower-alpha; }
+.formpart ul { list-style-position: outside; margin-left: 1.5em; }
+.formpart div.question ul { margin-left: 0; list-style-type: none; }
 
 .kosten tr th:first-child, .kosten tr td:first-child { min-width: 360px; text-align: left; }

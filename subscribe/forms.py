@@ -62,7 +62,11 @@ class SubscribeForm(forms.Form):
                 self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required)
                 self._elements += [('field', name)]
             elif question.question_type == "AFD":
-                self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
+                if question.radio:
+                    self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
+                                                    widget=forms.RadioSelect(choices=AFDELINGEN))
+                else:
+                    self.fields[name] = forms.CharField(max_length=256, label=question.name, required=question.required,
                                                     widget=forms.Select(choices=AFDELINGEN))
                 self._elements += [('field', name)]
             elif question.question_type == "BOOL":
@@ -74,7 +78,10 @@ class SubscribeForm(forms.Form):
                 self.fields[name] = forms.BooleanField(label=label, required=question.required)
                 self._elements += [('field', name)]
             elif question.question_type == "CHOICE":
-                self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False))
+                if question.radio:
+                    self.fields[name] = forms.ModelChoiceField(widget=forms.RadioSelect(), label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False), empty_label=None)
+                else:
+                    self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False), empty_label=None)
                 self._elements += [('field', name)]
             elif question.question_type == "TEXT":
                 allowed_tags = ['a', 'b', 'code', 'em', 'h3', 'i', 'img', 'strong', 'ul', 'ol', 'li', 'p', 'br']

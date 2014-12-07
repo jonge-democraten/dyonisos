@@ -115,6 +115,7 @@ class EventQuestion(models.Model):
     help = models.CharField(max_length=1024, blank=True)
     question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
     required = models.BooleanField(default=False)
+    radio = models.BooleanField(default=False, help_text='Voor multiple-choice: geen dropdown maar radio buttons')
     order = models.IntegerField(default=0)
     text = models.TextField(blank=True, default='', help_text='Geldige HTML tags: a, b/strong, code, em/i, h3, img, ul, ol, li, p, br; Geldige HTML attributen: class, style, a.href, a.target, img.src, img.alt')
 
