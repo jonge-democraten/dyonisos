@@ -36,6 +36,14 @@ AFDELINGEN = (
     ("INT", "Internationaal"),
 )
 
+
+def afdeling_text(afd):
+    for key, value in AFDELINGEN:
+        if key == afd:
+            return value
+    return None
+
+
 QUESTION_TYPES = (
     ("INT", "Integer"),
     ("TXT", "Text Input"),
@@ -220,12 +228,24 @@ class Registration(models.Model):
     def calculate_price(self):
         self.price = self.event.price + sum([answer.option.price for answer in self.answers.exclude(option=None)])
 
-    def get_options_name(self):
-        name = ''
-        for answer in self.answers.all():
-            if answer.option is not None:
-                name += answer.option.name + ', '
-        return name
+    def get_options_text(self):
+        results = []
+        added_default_fields = False
+        answers = {a.question: a.get_answer() for a in self.answers.all()}
+        for question in self.event.eventquestion_set.order_by('order'):
+            if question.order >= 0 and not added_default_fields:
+                results += ["Voornaam: {}".format(str(self.first_name))]
+                results += ["Achternaam: {}".format(str(self.last_name))]
+                results += ["Email: {}".format(str(self.email))]
+                added_default_fields = True
+            if question in answers:
+                results += ["{}: {}".format(str(question.name), str(answers[question]))]
+        if not added_default_fields:
+            results += ["Voornaam: {}".format(str(self.first_name))]
+            results += ["Achternaam: {}".format(str(self.last_name))]
+            results += ["Email: {}".format(str(self.email))]
+
+        return '\n'.join(results)
 
     def __unicode__(self):
         return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.price))
@@ -240,7 +260,7 @@ class Registration(models.Model):
         c = Context({
             "voornaam": self.first_name,
             "achternaam": self.last_name,
-            "inschrijf_opties": self.get_options_name(),
+            "inschrijf_opties": self.get_options_text(),
         })
         # XXX: Financiele info
         msg = MIMEText(t.render(c).encode('utf-8'), 'plain', 'utf-8')
@@ -291,12 +311,12 @@ class Answer(models.Model):
         elif self.question.question_type == "TXT":
             return self.txt_field
         elif self.question.question_type == "AFD":
-            return self.txt_field
+            return afdeling_text(self.txt_field)
         elif self.question.question_type == "BOOL":
             if self.option is not None:
                 return self.option
             else:
-                return self.bool_field
+                return self.bool_field and 'Ja' or 'Nee'
         elif self.question.question_type == "CHOICE":
             return self.option
 
