@@ -263,7 +263,8 @@ class Registration(models.Model):
             "inschrijf_opties": self.get_options_text(),
         })
         # XXX: Financiele info
-        msg = MIMEText(t.render(c).encode('utf-8'), 'plain', 'utf-8')
+        rendered_mail = t.render(c).encode('utf-8')
+        msg = MIMEText(rendered_mail, 'plain', 'utf-8')
         msg.set_charset("utf-8")
         msg["Subject"] = "Inschrijfbevestiging: %s" % (self.event.name)
         msg["From"] = self.event.contact_email
@@ -275,6 +276,7 @@ class Registration(models.Model):
             s.quit()
         except:
             logger.error("Could not send welcome mail to %s" % (self.email))
+        return rendered_mail
 
 
 class Answer(models.Model):

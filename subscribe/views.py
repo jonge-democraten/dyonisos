@@ -22,6 +22,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 from django.views.generic.list import ListView
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
 from subscribe.models import Event, EventQuestion
 from subscribe.forms import Registration, SubscribeForm, fill_subscription
@@ -64,9 +66,10 @@ def register(request, slug):
         elif valid:
             if 'testsubmit' in request.POST:
                 subscription = fill_subscription(form, event)
-                subscription.send_confirmation_email()
+                msg = subscription.send_confirmation_email()
                 subscription.delete()
-                return event_message(request, event, _("Een test-email is verstuurd."))
+                msg = '<br/>'.join(escape(msg).split('\n'))
+                return event_message(request, event, mark_safe(u"De volgende email is verstuurd:<br/><br/>{}".format(msg)))
             # Store the data
             subscription = fill_subscription(form, event)
             if subscription in event.get_registrations_over_limit():
