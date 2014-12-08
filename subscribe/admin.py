@@ -125,6 +125,9 @@ class EventOptionInline(admin.TabularInline):
 
 
 class EventQuestionAdmin(admin.ModelAdmin):
+    readonly_fields = ('event', )
+    list_display = ["name", "event", "order", "question_type", ]
+    list_filter = ["event"]
     inlines = [EventOptionInline]
 
 
