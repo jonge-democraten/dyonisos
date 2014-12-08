@@ -117,10 +117,10 @@ class EventQuestion(models.Model):
     name = models.CharField(max_length=64)
     help = models.CharField(max_length=1024, blank=True)
     question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
-    required = models.BooleanField(default=False)
-    radio = models.BooleanField(default=False, help_text='Voor multiple-choice: geen dropdown maar radio buttons')
-    order = models.IntegerField(default=0)
-    text = models.TextField(blank=True, default='', help_text='Geldige HTML tags: a, b/strong, code, em/i, h3, img, ul, ol, li, p, br; Geldige HTML attributen: class, style, a.href, a.target, img.src, img.alt')
+    required = models.BooleanField(default=False, help_text='Bij Ja/Nee: verplicht aanvinken; bij andere: verplicht invullen')
+    radio = models.BooleanField(default=False, help_text='Voor multiple-choice/afdeling: geen dropdown maar radio buttons')
+    order = models.IntegerField(default=0, help_text='Bepaalt volgorde op formulier; gebruik order<0 voor elementen vooraf aan voornaam, achternaam en email')
+    text = models.TextField(blank=True, default='', help_text='Voor "HTML Text"; geldige HTML tags: a, b/strong, code, em/i, h3, img, ul, ol, li, p, br; Geldige HTML attributen: class, style, a.href, a.target, img.src, img.alt')
 
     def __unicode__(self):
         return u"%s (%s)" % (self.name, self.question_type)
