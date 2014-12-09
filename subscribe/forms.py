@@ -100,6 +100,14 @@ class SubscribeForm(forms.Form):
                 text = mark_safe(bleach.clean(question.text, tags=allowed_tags, attributes=allowed_attrs))
                 self._elements += [('text', text)]
 
+        if not inserted_default_fields:
+            self.fields["first_name"] = forms.CharField(max_length=64, required=True, label="Voornaam")
+            self._elements += [('field', 'first_name')]
+            self.fields["last_name"] = forms.CharField(max_length=64, required=True, label="Achternaam")
+            self._elements += [('field', 'last_name')]
+            self.fields["email"] = forms.EmailField(required=True, label="Email")
+            self._elements += [('field', 'email')]
+
         self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
 
     def is_valid(self):
