@@ -115,8 +115,6 @@ class Event(models.Model):
         for question in self.eventquestion_set.all():
             for option in question.options.all():
                 results += option.get_registrations_over_limit()
-        for limit in self.registrationlimit_set.all():
-            results += limit.get_registrations_over_limit()
         return results
 
 
@@ -181,37 +179,8 @@ class EventOption(models.Model):
         return registrations[int(self.limit):]
 
     def limit_reached(self):
-        # Check our own first
-        if self.is_full():
-            return True
-        # Limit is reached when at least one of the registrationlimits has been reached
-        for l in self.registrationlimit_set.all():
-            if l.is_reached():
-                return True
-        return False
+        return self.is_full()
     limit_reached.boolean = True
-
-
-class RegistrationLimit(models.Model):
-    event = models.ForeignKey(Event)
-    options = models.ManyToManyField(EventOption, blank=True)
-    limit = models.IntegerField()
-    description = models.CharField(max_length=128, help_text="De foutmelding die word weergegeven als de limiet bereikt is (bijv: het hotel is vol).")
-
-    def __unicode__(self):
-        return u'Limiet: %d (%s)' % (self.limit, self.description)
-
-    def get_related_registrations(self):
-        return Registration.objects.filter(answers__option__in=self.options.all()).order_by('pk')
-
-    def is_reached(self):
-        registrations = self.get_related_registrations()
-        return registrations.count() >= self.limit
-    is_reached.boolean = True
-
-    def get_registrations_over_limit(self):
-        registrations = self.get_related_registrations()
-        return registrations[int(self.limit):]
 
 
 class Registration(models.Model):

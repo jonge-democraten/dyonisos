@@ -13,7 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 from subscribe.models import Registration, IdealIssuer
-from subscribe.models import Event, EventQuestion, EventOption, Answer, RegistrationLimit
+from subscribe.models import Event, EventQuestion, EventOption, Answer
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -84,20 +84,6 @@ class EventQuestionInline(admin.TabularInline):
         return format_html(u'<a href="{}">Edit</a>', url)
 
 
-class RegistrationLimitInline(admin.TabularInline):
-    model = RegistrationLimit
-    extra = 1
-    fields = ['limit', 'options', 'description', ]
-
-    def get_formset(self, request, obj=None, **kwargs):
-        self.parent_obj = obj
-        return super(RegistrationLimitInline, self).get_formset(request, obj, **kwargs)
-
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        kwargs['queryset'] = db_field.rel.to.objects.filter(question__event=self.parent_obj)
-        return super(RegistrationLimitInline, self).formfield_for_manytomany(db_field, request, **kwargs)
-
-
 class EventAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Event", {
@@ -110,7 +96,7 @@ class EventAdmin(admin.ModelAdmin):
     ]
     prepopulated_fields = {'slug': ('name',)}
     date_hierarchy = 'end_registration'
-    inlines = [EventQuestionInline, RegistrationLimitInline]
+    inlines = [EventQuestionInline]
     actions = [export_events, ]  # XXX: export
     list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'is_full', 'start_registration', 'end_registration']
     search_fields = ["name", ]

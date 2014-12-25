@@ -43,9 +43,6 @@ class SubscribeForm(forms.Form):
             for option in question.options.all():
                 if option.is_full():
                     closed_options += [option.pk]
-        for limit in event.registrationlimit_set.all():
-            if limit.is_reached():
-                closed_options += [o.pk for o in limit.options.all()]
 
         self._elements = []
         inserted_default_fields = False
