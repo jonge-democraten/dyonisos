@@ -41,7 +41,7 @@ def export_events(eventadmin, request, queryset):
 
         q_to_col = {}
         for question in event.eventquestion_set.all():
-            if event.question_type == "TEXT":
+            if question.question_type == "TEXT":
                 continue
             q_to_col[question.id] = col_count
             s.write(0, col_count, question.name)
