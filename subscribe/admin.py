@@ -74,7 +74,7 @@ export_events.short_description = "Export event subscriptions to excel."
 class EventQuestionInline(admin.TabularInline):
     model = EventQuestion
     extra = 1
-    fields = ['name', 'admin_link', 'order', 'question_type', 'required', ]
+    fields = ['name', 'admin_link', 'order', 'question_type', 'radio', 'required', ]
     readonly_fields = ('admin_link',)
     show_change_link = True  # Django 1.8
     ordering = ('order',)
