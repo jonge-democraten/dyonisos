@@ -31,6 +31,8 @@ class SubscribeForm(forms.Form):
         else:
             self.preview = False
 
+        kwargs['label_suffix'] = ''
+
         super(SubscribeForm, self).__init__(*args, **kwargs)
 
         self.event = event
