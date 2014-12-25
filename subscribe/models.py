@@ -121,7 +121,6 @@ class Event(models.Model):
 class EventQuestion(models.Model):
     event = models.ForeignKey(Event)
     name = models.CharField(max_length=64)
-    help = models.CharField(max_length=1024, blank=True)
     question_type = models.CharField(max_length=16, choices=QUESTION_TYPES)
     required = models.BooleanField(default=False, help_text='Bij Ja/Nee: verplicht aanvinken; bij andere: verplicht invullen')
     radio = models.BooleanField(default=False, help_text='Voor multiple-choice/afdeling: geen dropdown maar radio buttons')
