@@ -303,7 +303,7 @@ class IdealIssuer(models.Model):
         return self.name
 
     def safe_id(self):
-        return "%04d" % (self.issuer_id)
+        return str("%04d" % (self.issuer_id))
 
     class Meta:
         ordering = ['name']
