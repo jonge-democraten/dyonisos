@@ -14,6 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from __future__ import unicode_literals
+
 from django.db import models
 from django.template import Context, Template
 
@@ -204,17 +206,16 @@ class Registration(models.Model):
         answers = {a.question: a.get_answer() for a in self.answers.all()}
         for question in self.event.eventquestion_set.order_by('order'):
             if question.order >= 0 and not added_default_fields:
-                results += ["Voornaam: {}".format(str(self.first_name))]
-                results += ["Achternaam: {}".format(str(self.last_name))]
-                results += ["Email: {}".format(str(self.email))]
+                results += ["Voornaam: {}".format(self.first_name)]
+                results += ["Achternaam: {}".format(self.last_name)]
+                results += ["Email: {}".format(self.email)]
                 added_default_fields = True
             if question in answers:
-                results += ["{}: {}".format(str(question.name), str(answers[question]))]
+                results += ["{}: {}".format(question.name, answers[question])]
         if not added_default_fields:
-            results += ["Voornaam: {}".format(str(self.first_name))]
-            results += ["Achternaam: {}".format(str(self.last_name))]
-            results += ["Email: {}".format(str(self.email))]
-
+            results += ["Voornaam: {}".format(self.first_name)]
+            results += ["Achternaam: {}".format(self.last_name)]
+            results += ["Email: {}".format(self.email)]
         return '\n'.join(results)
 
     def __unicode__(self):
