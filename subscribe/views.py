@@ -164,6 +164,7 @@ def check(request):
 
     response = mollie.check(settings.MOLLIE['partner_id'], transaction_id)
     logger.info('views::check() - status: ' + str(response.order.status))
+    logger.info('views::check() - paid: ' + str(response.order.payed))
 
     try:
         subscription = Registration.objects.get(trxid=transaction_id)
