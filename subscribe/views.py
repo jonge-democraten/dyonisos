@@ -176,8 +176,9 @@ def check(request):
     elif response.order.payed and response.order.status == "Success":  # Mollie gives payed=true and status=Success only once
         subscription.payed = True
         subscription.status = "Success"
-        subscription.send_confirmation_email()
         subscription.save()
+        logger.info('views::check() - subscription saved to database')
+        subscription.send_confirmation_email()
         logger.info('views::check() - payed, saved and mail sent')
         return HttpResponse(_("OK"))
     else:
