@@ -19,6 +19,8 @@ import bleach
 from django import forms
 from django.db import transaction
 from django.db.models import Q
+from django.utils.encoding import force_text
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
@@ -50,6 +52,31 @@ class RadioSelectDisabled(forms.widgets.RadioSelect):
             return instance
         else:
             return super(RadioSelectDisabled, self).renderer(*args, **kwargs)
+
+
+class SelectDisabled(forms.widgets.Select):
+    def render_option(self, selected_choices, option_value, option_label):
+        if option_value is None:
+            option_value = ''
+        option_value = force_text(option_value)
+        if getattr(self, 'disabledset', None) is not None and getattr(self, 'disabledstr', None) is None:
+            self.disabledstr = set([str(x.pk) for x in self.disabledset])
+        if getattr(self, 'disabledstr', None) is not None and option_value in self.disabledstr:
+            disabled_html = mark_safe(' disabled="disabled"')
+        else:
+            disabled_html = ''
+        if option_value in selected_choices:
+            selected_html = mark_safe(' selected="selected"')
+            if not self.allow_multiple_selected:
+                # Only allow for a single selection.
+                selected_choices.remove(option_value)
+        else:
+            selected_html = ''
+        return format_html('<option value="{0}"{1}{2}>{3}</option>',
+                           option_value,
+                           selected_html,
+                           disabled_html,
+                           force_text(option_label))
 
 
 class SubscribeForm(forms.Form):
@@ -120,10 +147,10 @@ class SubscribeForm(forms.Form):
             elif question.question_type == "CHOICE":
                 if question.radio:
                     self.fields[name] = forms.ModelChoiceField(widget=RadioSelectDisabled(), label=question.name, required=question.required, queryset=question.options.exclude(active=False).order_by('order'), empty_label=None)
-                    self.fields[name].widget.disabledset = question.options.filter(Q(pk__in=closed_options) | Q(active=False))
                 else:
-                    self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False).order_by('order'), empty_label=None)
+                    self.fields[name] = forms.ModelChoiceField(widget=SelectDisabled(), label=question.name, required=question.required, queryset=question.options.exclude(active=False).order_by('order'), empty_label=None)
                 self._elements += [('field', name)]
+                self.fields[name].widget.disabledset = question.options.filter(Q(pk__in=closed_options) | Q(active=False))
             elif question.question_type == "TEXT":
                 allowed_tags = ['a', 'b', 'code', 'em', 'h3', 'i', 'img', 'strong', 'ul', 'ol', 'li', 'p', 'br']
                 allowed_attrs = {
