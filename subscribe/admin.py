@@ -107,16 +107,16 @@ class EventAdmin(admin.ModelAdmin):
 class EventOptionInline(admin.TabularInline):
     model = EventOption
     extra = 1
-    fields = ['order', 'name', 'price', 'limit', 'limit_str', 'active', ]
-    readonly_fields = ('limit_str',)
+    fields = ['order', 'name', 'price', 'limit', 'num_registrations', 'active', ]
+    readonly_fields = ('num_registrations',)
     ordering = ('order',)
 
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def limit_str(self, instance):
-        return instance.limit_str()
-    limit_str.short_description = "Limit usage"
+    def num_registrations(self, instance):
+        return instance.num_registrations()
+    num_registrations.short_description = "Registrations"
 
 
 class EventQuestionAdmin(admin.ModelAdmin):
