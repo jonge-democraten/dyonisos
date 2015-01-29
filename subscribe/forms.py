@@ -83,6 +83,7 @@ class SubscribeForm(forms.Form):
                     else:
                         label = u"%s: \u20AC %.2f" % (question.name, float(options[0].price) / 100)
                     if not options[0].active or options[0].is_full():
+                        label += u" (optie is vol)"
                         active = False
                 else:
                     label = question.name
