@@ -168,18 +168,20 @@ class EventOption(models.Model):
     def get_related_registrations(self):
         return Registration.objects.filter(answers__option=self).order_by('pk')
 
+    def num_registrations(self):
+        registrations = self.get_related_registrations()
+        return registrations.count()
+
     def is_full(self):
         if self.limit <= 0:
             return False
-        registrations = self.get_related_registrations()
-        return registrations.count() >= self.limit
+        return self.num_registrations() >= self.limit
     is_full.boolean = True
 
     def limit_str(self):
         if self.limit <= 0:
             return u"-"
-        registrations = self.get_related_registrations()
-        return u"{}/{}".format(registrations.count(), self.limit)
+        return u"{}/{}".format(self.num_registrations(), self.limit)
     limit_str.short_description = "Limit usage"
 
     def get_registrations_over_limit(self):
