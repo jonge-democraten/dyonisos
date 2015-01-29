@@ -18,12 +18,38 @@
 import bleach
 from django import forms
 from django.db import transaction
+from django.db.models import Q
 from django.utils.safestring import mark_safe
 
 from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
 
 
 setattr(forms.fields.Field, 'is_checkbox', lambda self: isinstance(self.widget, forms.CheckboxInput))
+
+
+class RadioChoiceInputDisabled(forms.widgets.RadioChoiceInput):
+    def __init__(self, *args, **kwargs):
+        disabledset = kwargs.pop('disabledset', None)
+        super(RadioChoiceInputDisabled, self).__init__(*args, **kwargs)
+        self.disabledset = set([str(x.pk) for x in disabledset])
+        if self.choice_value in self.disabledset:
+            self.attrs['disabled'] = 'disabled'
+
+
+class RadioFieldDisabledRenderer(forms.widgets.RadioFieldRenderer):
+    def choice_input_class(self, *args, **kwargs):
+        kwargs = dict(kwargs, disabledset=self.disabledset)
+        return RadioChoiceInputDisabled(*args, **kwargs)
+
+
+class RadioSelectDisabled(forms.widgets.RadioSelect):
+    def renderer(self, *args, **kwargs):
+        if getattr(self, 'disabledset', None) is not None:
+            instance = RadioFieldDisabledRenderer(*args, **kwargs)
+            instance.disabledset = self.disabledset
+            return instance
+        else:
+            return super(RadioSelectDisabled, self).renderer(*args, **kwargs)
 
 
 class SubscribeForm(forms.Form):
@@ -93,7 +119,8 @@ class SubscribeForm(forms.Form):
                 self._elements += [('field', name)]
             elif question.question_type == "CHOICE":
                 if question.radio:
-                    self.fields[name] = forms.ModelChoiceField(widget=forms.RadioSelect(), label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False).order_by('order'), empty_label=None)
+                    self.fields[name] = forms.ModelChoiceField(widget=RadioSelectDisabled(), label=question.name, required=question.required, queryset=question.options.exclude(active=False).order_by('order'), empty_label=None)
+                    self.fields[name].widget.disabledset = question.options.filter(Q(pk__in=closed_options) | Q(active=False))
                 else:
                     self.fields[name] = forms.ModelChoiceField(label=question.name, required=question.required, queryset=question.options.exclude(pk__in=closed_options).exclude(active=False).order_by('order'), empty_label=None)
                 self._elements += [('field', name)]
