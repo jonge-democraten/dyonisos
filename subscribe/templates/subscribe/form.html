@@ -17,9 +17,9 @@
 {% elif element_type == "field" %}
   {% with field=element_value %}
   {% if field.field.is_checkbox %}
-<div class='checkbox'>{{ field }}{{ field.label_tag}}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
+<div class='checkbox'>{{ field }}{% if field.field.required %}<label for="{{ field.id_for_label }}">{{ field.label }} <span class="required">*</span></label>{% else %}{{ field.label_tag }}{% endif %}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
   {% else %}
-<div class='question'>{{ field.label_tag}}{{ field }}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
+<div class='question'>{% if field.field.required %}<label for="{{ field.id_for_label }}">{{ field.label }} <span class='required'>*</span></label>{% else %}{{ field.label_tag }}{% endif %}{{ field }}{% for error in field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
   {% endif %}
   {% endwith %}
 {% endif %}

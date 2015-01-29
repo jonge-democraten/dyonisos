@@ -17,6 +17,8 @@ label { font-weight: bold; font-size: 90%; }
 label:hover { text-decoration: underline; }
 .formpart div:hover { background-color: #f4f4f4; }
 
+.formpart .required { color: red; font-size:90%; }
+
 input[type="submit"] {
   background: #578439 url('https://jongedemocraten.nl/templates/jd/images/TitleBackground.png'); background-repeat: repeat-x;
   border-radius: 2px; border: 1px solid #353;
