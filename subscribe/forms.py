@@ -76,14 +76,19 @@ class SubscribeForm(forms.Form):
                 self._elements += [('field', name)]
             elif question.question_type == "BOOL":
                 options = question.options.all()
+                active = True
                 if len(options) and options[0].price != 0:
                     if options[0].price < 0:
                         label = u"%s: \u20AC %.2f korting" % (question.name, float(-options[0].price) / 100)
                     else:
                         label = u"%s: \u20AC %.2f" % (question.name, float(options[0].price) / 100)
+                    if not options[0].active or options[0].is_full():
+                        active = False
                 else:
                     label = question.name
                 self.fields[name] = forms.BooleanField(label=label, required=question.required)
+                if not active:
+                    self.fields[name].widget.attrs['disabled'] = 'disabled'
                 self._elements += [('field', name)]
             elif question.question_type == "CHOICE":
                 if question.radio:
