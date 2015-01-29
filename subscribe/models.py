@@ -175,6 +175,13 @@ class EventOption(models.Model):
         return registrations.count() >= self.limit
     is_full.boolean = True
 
+    def limit_str(self):
+        if self.limit <= 0:
+            return u"-"
+        registrations = self.get_related_registrations()
+        return u"{}/{}".format(registrations.count(), self.limit)
+    limit_str.short_description = "Limit usage"
+
     def get_registrations_over_limit(self):
         if self.limit <= 0:
             return []
