@@ -24,7 +24,6 @@ def event_message(request, event, message):
 
 def register(request, slug):
     logger = logging.getLogger(__name__)
-    logger.info('views::register() - start')
 
     # Get the event
     event = get_object_or_404(Event, slug=slug)
@@ -46,7 +45,6 @@ def register(request, slug):
         return render_to_response("subscribe/form.html", c)
 
     # It is a POST request, check if the form is valid...
-    logger.info('views::register() - form POST')
     form = SubscribeForm(event, request.POST)
     if not form.is_valid():
         c = {"event": event, "request": request, "form": form, "user_is_staff": request.user.is_staff}
@@ -93,7 +91,6 @@ def register(request, slug):
         subscription.payed = True
         subscription.send_confirmation_email()
         subscription.save()
-        logger.info('views::register() - registered for a free event.')
         return event_message(request, event, _("Inschrijving geslaagd. Ter bevestiging is een e-mail verstuurd."))
 
     # Payment required...
@@ -123,9 +120,14 @@ def register(request, slug):
 
 
 def check_transaction(subscription):
+    logger = logging.getLogger(__name__)
+    logger.info('check_transaction: Checking transaction %d with id %s' % (subscription.id, subscription.trxid))
+
     mollie = Mollie.API.Client()
     mollie.setApiKey(settings.MOLLIE_KEY)
     payment = mollie.payments.get(subscription.trxid)
+
+    logger.info("check_transaction: Transaction %s has status %s" % (subscription.id, payment['status']))
 
     subscription.status = payment['status']
     subscription.payed = payment.isPaid()
