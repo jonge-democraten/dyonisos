@@ -77,11 +77,11 @@ class Event(models.Model):
     def subscribed(self):
         return len(Registration.objects.filter(event=self))
 
-    def payed(self):
-        return len(Registration.objects.filter(event=self).filter(payed=True))
+    def paid(self):
+        return len(Registration.objects.filter(event=self).filter(paid=True))
 
-    def total_payed(self):
-        return "\u20AC %.2f" % (sum([e.price for e in self.registrations.filter(payed=True)]) / 100.)
+    def total_paid(self):
+        return "\u20AC %.2f" % (sum([e.price for e in self.registrations.filter(paid=True)]) / 100.)
 
     def form_link(self):
         return "<a href=\"https://events.jongedemocraten.nl/inschrijven/%s/\">Inschrijven</a>" % (self.slug)
@@ -201,7 +201,7 @@ class Registration(models.Model):
     email = models.EmailField(blank=True)
     event = models.ForeignKey(Event, related_name='registrations')
     price = models.IntegerField(default=0)
-    payed = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False)
     status = models.CharField(max_length=64, default="", blank=True)
     trxid = models.CharField(max_length=128, default="", blank=True)
 

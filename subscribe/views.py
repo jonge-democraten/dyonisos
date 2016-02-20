@@ -86,7 +86,7 @@ def register(request, slug):
 
     # Check if we need to pay or not...
     if subscription.price <= 0:
-        subscription.payed = True
+        subscription.paid = True
         subscription.send_confirmation_email()
         subscription.save()
         return event_message(request, event, _("Inschrijving geslaagd. Ter bevestiging is een e-mail verstuurd."))
@@ -128,9 +128,9 @@ def check_transaction(subscription):
     logger.info("check_transaction: Transaction %s has status %s" % (subscription.id, payment['status']))
 
     subscription.status = payment['status']
-    subscription.payed = payment.isPaid()
+    subscription.paid = payment.isPaid()
     subscription.save()
-    if subscription.payed:
+    if subscription.paid:
         subscription.send_confirmation_email()
 
 

@@ -54,7 +54,7 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 0, reg.first_name)
             s.write(row, 1, reg.last_name)
             s.write(row, 2, reg.email)
-            s.write(row, 3, reg.payed)
+            s.write(row, 3, reg.paid)
             s.write(row, 4, float(reg.price) / 100)
             s.write(row, 5, reg.id)
 
@@ -99,7 +99,7 @@ class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'end_registration'
     inlines = [EventQuestionInline]
     actions = [export_events, ]  # XXX: export
-    list_display = ['name', 'form_link', 'subscribed', 'total_payed', 'is_full', 'start_registration', 'end_registration']
+    list_display = ['name', 'form_link', 'subscribed', 'total_paid', 'is_full', 'start_registration', 'end_registration']
     search_fields = ["name", ]
 
 
@@ -143,8 +143,8 @@ class AnswerInline(admin.TabularInline):
 
 class RegistrationAdmin(admin.ModelAdmin):
     readonly_fields = ('registration_date', 'trxid')
-    list_display = ["id", "event", "first_name", "last_name", "status", "registration_date", "payed", "trxid", ]
-    list_filter = ["payed", "event"]
+    list_display = ["id", "event", "first_name", "last_name", "status", "registration_date", "paid", "trxid", ]
+    list_filter = ["paid", "event"]
     search_fields = ["first_name", "last_name"]
     inlines = [AnswerInline]
 
