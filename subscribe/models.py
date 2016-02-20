@@ -15,7 +15,6 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-
 from django.db import models
 from django.template import Context, Template
 
@@ -301,18 +300,3 @@ class Answer(models.Model):
                 return self.bool_field and 'Ja' or 'Nee'
         elif self.question.question_type == "CHOICE":
             return self.option
-
-
-class IdealIssuer(models.Model):
-    issuer_id = models.IntegerField()
-    update = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=128)
-
-    def __str__(self):
-        return self.name
-
-    def safe_id(self):
-        return str("%04d" % (self.issuer_id))
-
-    class Meta:
-        ordering = ['name']

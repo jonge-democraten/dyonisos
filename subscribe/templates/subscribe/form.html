@@ -34,8 +34,7 @@
 <div class="kosten formpart"><h3>Kosten</h3>
 {% if form.price %}
 {{form.price_description|safe}}
-<div class='question'>{{ form.issuer_field.label_tag}}{{ form.issuer_field }}{% for error in form.issuer_field.errors %}<div class='error'>{{ error }}</div>{% endfor %}</div>
-<div style="margin-top:1em;">Direct na het inschrijven kom je terecht bij iDEAL. Doorloop het betalingsproces volledig en sluit de browser niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. <br />
+<div style="margin-top:1em;">Direct na het inschrijven kom je terecht bij Mollie. Doorloop het betalingsproces volledig en sluit de browser niet voortijdig af, anders wordt je betaling mogelijk niet goed verwerkt. <br />
 Neem bij problemen contact op met het <a href="mailto:ict@jongedemocraten.nl?subject=iDEAL%20betaalfout">ICT-team</a>.</div>
 {% else %}
 <p>Het is gratis!</p>

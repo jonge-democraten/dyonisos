@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2011, Floor Terra <floort@gmail.com>
+# Copyright (c) 2011,2014 Floor Terra <floort@gmail.com>
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +13,6 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
 
 
 import bleach
@@ -170,7 +169,7 @@ class SubscribeForm(forms.Form):
             self.fields["email"] = forms.EmailField(required=True, label="Email")
             self._elements += [('field', 'email')]
 
-        self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
+        # self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
 
     def is_valid(self):
         res = super(SubscribeForm, self).is_valid()
@@ -212,8 +211,8 @@ class SubscribeForm(forms.Form):
         self.price = price
         self.price_description = str
 
-        if self.price > 0:
-            self.fields['issuer'].required = True
+        # if self.price > 0:
+        #     self.fields['issuer'].required = True
 
     def visible_fields(self):
         fields = [f for f in self.fields if not f == 'issuer']
