@@ -23,7 +23,7 @@ from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from subscribe.models import Answer, IdealIssuer, Registration, AFDELINGEN
+from subscribe.models import Answer, Registration, AFDELINGEN
 
 
 setattr(forms.fields.Field, 'is_checkbox', lambda self: isinstance(self.widget, forms.CheckboxInput))
@@ -169,8 +169,6 @@ class SubscribeForm(forms.Form):
             self.fields["email"] = forms.EmailField(required=True, label="Email")
             self._elements += [('field', 'email')]
 
-        # self.fields["issuer"] = forms.ModelChoiceField(queryset=IdealIssuer.objects.all(), label="Bank (iDEAL)", required=False)
-
     def is_valid(self):
         res = super(SubscribeForm, self).is_valid()
         if not res:
@@ -211,16 +209,9 @@ class SubscribeForm(forms.Form):
         self.price = price
         self.price_description = str
 
-        # if self.price > 0:
-        #     self.fields['issuer'].required = True
-
     def visible_fields(self):
-        fields = [f for f in self.fields if not f == 'issuer']
         fields = [self[f] for f in fields]
         return [field for field in fields if not field.is_hidden]
-
-    def issuer_field(self):
-        return self['issuer']
 
     def elements(self):
         res = []

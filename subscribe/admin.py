@@ -14,8 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from subscribe.models import Registration, IdealIssuer
-from subscribe.models import Event, EventQuestion, EventOption, Answer
+from subscribe.models import Event, EventQuestion, EventOption, Answer, Registration
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -150,12 +149,6 @@ class RegistrationAdmin(admin.ModelAdmin):
     inlines = [AnswerInline]
 
 
-class IdealIssuerAdmin(admin.ModelAdmin):
-    model = IdealIssuer
-    list_display = ['issuer_id', 'name']
-
-
 admin.site.register(EventQuestion, EventQuestionAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Registration, RegistrationAdmin)
-admin.site.register(IdealIssuer, IdealIssuerAdmin)
