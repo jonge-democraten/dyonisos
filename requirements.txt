@@ -4,3 +4,4 @@ pycurl==7.43.0
 xlwt==1.0.0
 bleach==1.4.2
 -e git+https://github.com/jonge-democraten/janeus@1.4#egg=janeus
+mollie-api-python==1.1.1
