@@ -3,7 +3,6 @@
 # SECURITY WARNING: Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -23,7 +22,6 @@ DATABASES = {
 STATIC_ROOT = '/usr/share/events/static/'
 STATIC_URL = '/static/'
 
-
 # Janeus settings
 
 JANEUS_SERVER = "ldap://127.0.0.1:389/"
@@ -31,13 +29,6 @@ JANEUS_DN = "cn=readuser, ou=sysUsers, dc=jd, dc=nl"
 JANEUS_PASS = ""
 AUTHENTICATION_BACKENDS = ('janeus.backend.JaneusBackend', 'django.contrib.auth.backends.ModelBackend',)
 
-
 # Dyonisos specific configuration
 
-MOLLIE = { # Mollie config
-    'partner_id': 0, # Mollie.nl accountnummer
-    'profile_key': '',
-    'report_url': 'https://events.jongedemocraten.nl/report/',
-    'return_url': 'https://events.jongedemocraten.nl/return/',
-    'testmode': 'false'
-}
+MOLLIE_KEY = ''
