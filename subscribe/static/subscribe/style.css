@@ -20,7 +20,7 @@ label:hover { text-decoration: underline; }
 .formpart .required { color: red; font-size:90%; }
 
 input[type="submit"] {
-  background: #578439 url('https://jongedemocraten.nl/templates/jd/images/TitleBackground.png'); background-repeat: repeat-x;
+  background: #578439 url('https://jongedemocraten.nl/static/website/images/TitleBackground.png'); background-repeat: repeat-x;
   border-radius: 2px; border: 1px solid #353;
   display: inline-block;
   text-shadow: 1px 1px 0px #000;
