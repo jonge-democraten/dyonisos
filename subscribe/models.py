@@ -72,7 +72,7 @@ class Event(models.Model):
     class Meta:
         ordering = ('-end_registration',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def subscribed(self):
@@ -131,7 +131,7 @@ class EventQuestion(models.Model):
     order = models.IntegerField(default=0, help_text='Bepaalt volgorde op formulier; gebruik order<0 voor elementen vooraf aan voornaam, achternaam en email')
     text = models.TextField(blank=True, default='', help_text='Voor "HTML Text"; geldige HTML tags: a, b/strong, code, em/i, h3, img, ul, ol, li, p, br; Geldige HTML attributen: class, style, a.href, a.target, img.src, img.alt')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s (%s)" % (self.name, self.question_type)
 
     def form_id(self):
@@ -150,7 +150,7 @@ class EventOption(models.Model):
     order = models.IntegerField(default=0)
     limit = models.IntegerField(default=0, help_text="Aantal beschikbare plekken (0 = geen limiet)")
 
-    def __unicode__(self):
+    def __str__(self):
         if self.price < 0:
             return "%s: \u20AC %.2f korting" % (self.name, float(-self.price) / 100)
         if self.price > 0:
@@ -227,7 +227,7 @@ class Registration(models.Model):
             results += ["Email: {}".format(self.email)]
         return '\n'.join(results)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.price))
 
     def gen_subscription_id(self):
@@ -268,7 +268,7 @@ class Answer(models.Model):
     bool_field = models.BooleanField(default=False)
     option = models.ForeignKey(EventOption, default=None, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s - %s" % (self.question, self.get_answer())
 
     def set_answer(self, ans):
@@ -308,7 +308,7 @@ class IdealIssuer(models.Model):
     update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=128)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def safe_id(self):
