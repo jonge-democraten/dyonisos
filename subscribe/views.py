@@ -101,7 +101,7 @@ def register(request, slug):
         redirectUrl = request.build_absolute_uri(reverse("return_page", args=[subscription.id])) 
 
         payment = mollie.payments.create({
-            'amount': subscription.price,
+            'amount': float(subscription.price) / 100.0,
             'description': subscription.event.name,
             'webhookUrl': webhookUrl,
             'redirectUrl': redirectUrl,
