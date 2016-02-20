@@ -210,7 +210,7 @@ class SubscribeForm(forms.Form):
         self.price_description = str
 
     def visible_fields(self):
-        fields = [self[f] for f in fields]
+        fields = [self[f] for f in self.fields]
         return [field for field in fields if not field.is_hidden]
 
     def elements(self):

@@ -73,7 +73,6 @@ def register(request, slug):
     if not subscription:
         # Error Filling subscription
         error_str = "Error in saving form."
-        logger.error(error_str)
         return HttpResponse(_(error_str))
 
     # Check (again) if maybe the number of registrations is over the limit...
@@ -83,7 +82,6 @@ def register(request, slug):
             error_str = "De inschrijving kan niet worden voltooid, omdat het maximum aantal inschrijvingen is bereikt."
         else:
             error_str = "De inschrijving kan niet worden voltooid, omdat een van de gekozen opties het maximum aantal inschrijvingen heeft bereikt."
-        logger.error(error_str)
         return event_message(request, event, _(error_str))
 
     # Check if we need to pay or not...
@@ -114,7 +112,7 @@ def register(request, slug):
 
         return HttpResponseRedirect(payment.getPaymentUrl())
     except Mollie.API.Error as e:
-        error_str = "views::register() - Technische fout, probeer later opnieuw." + "\n\n%s" % (e.message,)
+        error_str = "register: Technische fout, probeer later opnieuw.\n\n" + e.message
         logger.error(error_str)
         return event_message(request, event, _(error_str))
 
