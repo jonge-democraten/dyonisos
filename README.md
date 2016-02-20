@@ -7,19 +7,20 @@ Dyonisos was made for. It should be easy to create a form for an event,
 easy for guests to subscribe and pay and easy for the organizers of the
 event to see who is subscribed to what.
 
-Installation
+Quick install
 ============
-Most dependencies are handled by pip and `requirements.txt`.
-
-    $ pip install -r requirements.txt
-    
-You will need a Mollie.nl account to handle payments.
-
+1. `$ ./clean_env.sh`
+1. `$ ./build_env.sh`
+1. `$ source ./env/bin/activate`
+1. `$ cp events/local_settings_example.py events/local_settings.py`
+1. Modify `events/local_settings.py` with appropriate values for `SECRET_KEY` and `MOLLIE_KEY`.
+1. `$ python manage.py migrate`
+1. `$ python manage.py createsuperuser`
+1. `$ python manage.py runserver`
 
 Special credits
 ===============
 Mathijs Kleijnen: 
-    Suggesting the name Dyonisos
+    Suggesting the name Dyonisos  
 Jonge Democraten: 
-    Supporting developement
-
+    Supporting development
