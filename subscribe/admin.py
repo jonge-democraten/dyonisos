@@ -22,7 +22,7 @@ from django.http import HttpResponse
 from django.utils.html import format_html
 
 from xlwt import Workbook
-import cStringIO as StringIO
+import io as StringIO
 
 
 def export_events(eventadmin, request, queryset):
@@ -60,7 +60,7 @@ def export_events(eventadmin, request, queryset):
             s.write(row, 5, reg.id)
 
             for ans in reg.answers.all():
-                s.write(row, q_to_col[ans.question.id], u'{}'.format(ans.get_answer()))
+                s.write(row, q_to_col[ans.question.id], '{}'.format(ans.get_answer()))
 
             row += 1
 
@@ -83,7 +83,7 @@ class EventQuestionInline(admin.TabularInline):
 
     def admin_link(self, instance):
         url = reverse('admin:subscribe_eventquestion_change', args=(instance.id,))
-        return format_html(u'<a href="{}">Edit</a>', url)
+        return format_html('<a href="{}">Edit</a>', url)
 
 
 class EventAdmin(admin.ModelAdmin):

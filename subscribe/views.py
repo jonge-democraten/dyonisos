@@ -71,7 +71,7 @@ def register(request, slug):
                 msg = subscription.send_confirmation_email()
                 subscription.delete()
                 msg = '<br/>'.join(escape(msg).split('\n'))
-                return event_message(request, event, mark_safe(u"De volgende email is verstuurd:<br/><br/>{}".format(msg)))
+                return event_message(request, event, mark_safe("De volgende email is verstuurd:<br/><br/>{}".format(msg)))
             # Store the data
             subscription = fill_subscription(form, event)
             if subscription in event.get_registrations_over_limit():
@@ -198,7 +198,7 @@ def delete_event_question(request):
     if warning == 0:
         eventQuestion = EventQuestion.objects.get(pk=questionId)
         eventQuestion.delete()
-        return HttpResponse(_(u'Vraag verwijderd. <br /> <a href="/admin/">Terug naar admin.</a>'))
+        return HttpResponse(_('Vraag verwijderd. <br /> <a href="/admin/">Terug naar admin.</a>'))
     else:
         return HttpResponse(_("""Weet je zeker dat je deze vraag wilt verwijderen? <br />
                                  <a href="/deleteEventQuestion/?questionId=%d&warning=%d">Ja</a>

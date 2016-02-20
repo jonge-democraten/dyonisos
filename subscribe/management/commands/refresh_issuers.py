@@ -21,4 +21,4 @@ class Command(BaseCommand):
         for bank in mollie.banklist():
             issuer = IdealIssuer(issuer_id=bank.bank_id, name=bank.bank_name)
             issuer.save()
-            print "%d\t%s" % (bank.bank_id, bank.bank_name)
+            print("%d\t%s" % (bank.bank_id, bank.bank_name))

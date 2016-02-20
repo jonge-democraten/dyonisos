@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from __future__ import unicode_literals
+
 
 import bleach
 from django import forms
@@ -133,11 +133,11 @@ class SubscribeForm(forms.Form):
                 active = True
                 if len(options) and options[0].price != 0:
                     if options[0].price < 0:
-                        label = u"%s: \u20AC %.2f korting" % (question.name, float(-options[0].price) / 100)
+                        label = "%s: \u20AC %.2f korting" % (question.name, float(-options[0].price) / 100)
                     else:
-                        label = u"%s: \u20AC %.2f" % (question.name, float(options[0].price) / 100)
+                        label = "%s: \u20AC %.2f" % (question.name, float(options[0].price) / 100)
                     if not options[0].active or options[0].is_full():
-                        label += u" (optie is vol)"
+                        label += " (optie is vol)"
                         active = False
                 else:
                     label = question.name
@@ -188,17 +188,17 @@ class SubscribeForm(forms.Form):
         for f in self.fields:
             self.fields[f].widget.attrs['readonly'] = True
 
-        str = u'<table><tr><th>Omschrijving</th><th>Bedrag</th></tr>'
+        str = '<table><tr><th>Omschrijving</th><th>Bedrag</th></tr>'
         price = self.event.price
         if price != 0:
-            str += u'<tr><td>Standaard:</td><td>\u20AC {:.2f}</td></tr>'.format(float(price) / 100.)
+            str += '<tr><td>Standaard:</td><td>\u20AC {:.2f}</td></tr>'.format(float(price) / 100.)
         for question in self.event.eventquestion_set.order_by('order'):
             if question.question_type == 'CHOICE':
                 option = self.cleaned_data[question.form_id()]
                 if option is not None:
                     if option.price != 0:
                         price += option.price
-                        str += u'<tr><td>{}</td><td>\u20AC {:.2f}</td></tr>'.format(option.name, float(option.price) / 100.)
+                        str += '<tr><td>{}</td><td>\u20AC {:.2f}</td></tr>'.format(option.name, float(option.price) / 100.)
             if question.question_type == 'BOOL':
                 if self.cleaned_data[question.form_id()]:
                     option = list(question.options.all()[:1])
@@ -206,9 +206,9 @@ class SubscribeForm(forms.Form):
                         option = option[0]
                         if option.price != 0:
                             price += option.price
-                            str += u'<tr><td>{}</td><td>\u20AC {:.2f}</td></tr>'.format(option.name, float(option.price) / 100.)
-        str += u'<tr><td><strong>Totaal:</strong></td><td><strong>\u20AC {:.2f}</strong></td></tr>'.format(float(price) / 100.)
-        str += u'</table>'
+                            str += '<tr><td>{}</td><td>\u20AC {:.2f}</td></tr>'.format(option.name, float(option.price) / 100.)
+        str += '<tr><td><strong>Totaal:</strong></td><td><strong>\u20AC {:.2f}</strong></td></tr>'.format(float(price) / 100.)
+        str += '</table>'
         self.price = price
         self.price_description = str
 

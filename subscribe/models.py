@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from __future__ import unicode_literals
+
 
 from django.db import models
 from django.template import Context, Template
@@ -82,7 +82,7 @@ class Event(models.Model):
         return len(Registration.objects.filter(event=self).filter(payed=True))
 
     def total_payed(self):
-        return u"\u20AC %.2f" % (sum([e.price for e in self.registrations.filter(payed=True)]) / 100.)
+        return "\u20AC %.2f" % (sum([e.price for e in self.registrations.filter(payed=True)]) / 100.)
 
     def form_link(self):
         return "<a href=\"https://events.jongedemocraten.nl/inschrijven/%s/\">Inschrijven</a>" % (self.slug)
@@ -104,7 +104,7 @@ class Event(models.Model):
     # active.boolean = True
 
     def price_str(self):
-        return u"\u20AC %.2f" % (float(self.price) / 100)
+        return "\u20AC %.2f" % (float(self.price) / 100)
 
     def is_full(self):
         if self.max_registrations <= 0:
@@ -132,13 +132,13 @@ class EventQuestion(models.Model):
     text = models.TextField(blank=True, default='', help_text='Voor "HTML Text"; geldige HTML tags: a, b/strong, code, em/i, h3, img, ul, ol, li, p, br; Geldige HTML attributen: class, style, a.href, a.target, img.src, img.alt')
 
     def __unicode__(self):
-        return u"%s (%s)" % (self.name, self.question_type)
+        return "%s (%s)" % (self.name, self.question_type)
 
     def form_id(self):
         return "q%d" % (self.id)
 
     def delete_event_question(self):
-        return u'<a href="/deleteEventQuestion/?optionId=%d">Delete</a>' % (self.id)
+        return '<a href="/deleteEventQuestion/?optionId=%d">Delete</a>' % (self.id)
     delete_event_question.allow_tags = True
 
 
@@ -152,17 +152,17 @@ class EventOption(models.Model):
 
     def __unicode__(self):
         if self.price < 0:
-            return u"%s: \u20AC %.2f korting" % (self.name, float(-self.price) / 100)
+            return "%s: \u20AC %.2f korting" % (self.name, float(-self.price) / 100)
         if self.price > 0:
-            return u"%s: \u20AC %.2f" % (self.name, float(self.price) / 100)
+            return "%s: \u20AC %.2f" % (self.name, float(self.price) / 100)
         else:
-            return u"%s" % (self.name,)
+            return "%s" % (self.name,)
 
     def price_str(self):
-        return u"\u20AC %.2f" % (float(self.price) / 100)
+        return "\u20AC %.2f" % (float(self.price) / 100)
 
     def delete_event_option(self):
-        return u'<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
+        return '<a href="/deleteEventOption/?optionId=%d">Delete</a>' % (self.id)
     delete_event_option.allow_tags = True
 
     def get_related_registrations(self):
@@ -180,8 +180,8 @@ class EventOption(models.Model):
 
     def limit_str(self):
         if self.limit <= 0:
-            return u"-"
-        return u"{}/{}".format(self.num_registrations(), self.limit)
+            return "-"
+        return "{}/{}".format(self.num_registrations(), self.limit)
     limit_str.short_description = "Limit usage"
 
     def get_registrations_over_limit(self):
@@ -228,7 +228,7 @@ class Registration(models.Model):
         return '\n'.join(results)
 
     def __unicode__(self):
-        return u"%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.price))
+        return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.price))
 
     def gen_subscription_id(self):
         num_id = str(self.id)
@@ -269,7 +269,7 @@ class Answer(models.Model):
     option = models.ForeignKey(EventOption, default=None, null=True)
 
     def __unicode__(self):
-        return u"%s - %s" % (self.question, self.get_answer())
+        return "%s - %s" % (self.question, self.get_answer())
 
     def set_answer(self, ans):
         if self.question.question_type == "INT":

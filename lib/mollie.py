@@ -7,9 +7,9 @@ https://www.mollie.nl/support/documentatie/betaaldiensten/ideal
 
 from django.conf import settings
 
-import cStringIO
+import io
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import pycurl
 from lxml import objectify
@@ -79,7 +79,7 @@ ERROR_MESSAGE = {
 
 
 def httpsrequest(url):
-    buf = cStringIO.StringIO()
+    buf = io.StringIO()
     c = pycurl.Curl()
     c.setopt(c.URL, url)
     c.setopt(c.WRITEFUNCTION, buf.write)
@@ -109,7 +109,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     if type(amount) == str:
         if not amount.isdigit(): raise ValueError("Parameter amount should not contain non-digit characters.")
         amount = int(amount)
-    elif type(amount) != int and type(amount) != long:
+    elif type(amount) != int:
         raise TypeError("Parameter amount should be a string or an integer.")
     if type(bank_id) == int:
         # Bank_id should be a integer between 0 and 10000 with leading zeroes.
@@ -125,7 +125,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
         logger.info("mollie::fetch() - Parameter 'description' is longer than 29 characters. Only first 29 will be send.")
         description = description[:29]
     
-    params = urllib.urlencode({
+    params = urllib.parse.urlencode({
         "a": "fetch",
         "partnerid": partnerid,
         "amount": amount,
@@ -144,7 +144,7 @@ def fetch(partnerid, amount, bank_id, description, reporturl, returnurl, profile
     return obj
             
 def check(partnerid, transaction_id):
-    params = urllib.urlencode({
+    params = urllib.parse.urlencode({
         "a": "check",
         "partnerid": partnerid,
         "transaction_id": transaction_id,
