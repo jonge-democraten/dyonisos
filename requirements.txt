@@ -1,10 +1,6 @@
-Django==1.7
-argparse==1.2.1
-lxml==3.4.0
-pycurl==7.19.5
-wsgiref==0.1.2
-xlwt==0.7.5
-bleach==1.4
-MySQL-python==1.2.5
-gunicorn==19.3.0
--e git+https://github.com/jonge-democraten/janeus@1.2#egg=janeus
+Django==1.9.2
+lxml==3.5.0
+pycurl==7.43.0
+xlwt==1.0.0
+bleach==1.4.2
+-e git+https://github.com/jonge-democraten/janeus@1.4#egg=janeus
