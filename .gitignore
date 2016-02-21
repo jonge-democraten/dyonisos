@@ -4,5 +4,6 @@ database.sqlite
 *.log
 *.swp
 *~
-settings.py
 lib/includes/
+env/
+local_settings.py
