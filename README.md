@@ -1,3 +1,4 @@
+[![Dependency Status](https://gemnasium.com/jonge-democraten/dyonisos.svg)](https://gemnasium.com/jonge-democraten/dyonisos) 
 About
 =====
 Dyonisos is a Django based web application that was developed for the
