@@ -18,6 +18,13 @@ Quick install
 1. `$ python manage.py createsuperuser`
 1. `$ python manage.py runserver`
 
+### System dependencies
+On Ubuntu, the following packages need to be installed before running `build_env.sh`,
+- python-dev
+- python-pycurl
+- libcurl4-openssl-dev
+- libmysqlclient-dev
+
 Special credits
 ===============
 Mathijs Kleijnen: 
