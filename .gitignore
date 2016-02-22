@@ -1,5 +1,6 @@
 *.pyc
 db.sqlite
+db.sqlite3
 database.sqlite
 *.log
 *.swp
