@@ -21,9 +21,7 @@ Quick install
 
 ### System dependencies
 On Ubuntu, the following packages need to be installed before running `build_env.sh`,
-- python-dev
-- python-pycurl
-- libcurl4-openssl-dev
+- python3-dev
 - libmysqlclient-dev
 
 Special credits

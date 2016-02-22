@@ -1,6 +1,5 @@
 Django==1.9.2
 lxml==3.5.0
-pycurl==7.43.0
 xlwt==1.0.0
 bleach==1.4.2
 -e git+https://github.com/jonge-democraten/janeus@1.4#egg=janeus
