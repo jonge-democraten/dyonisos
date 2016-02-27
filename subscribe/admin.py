@@ -21,7 +21,7 @@ from django.http import HttpResponse
 from django.utils.html import format_html
 
 from xlwt import Workbook
-import io as StringIO
+import io as BytesIO
 
 
 def export_events(eventadmin, request, queryset):
@@ -63,7 +63,7 @@ def export_events(eventadmin, request, queryset):
 
             row += 1
 
-    out = StringIO.StringIO()
+    out = BytesIO.BytesIO()
     wb.save(out)
     response = HttpResponse(out.getvalue(), content_type="application/excel")
     response['Content-Disposition'] = 'attachment; filename=events.xls'

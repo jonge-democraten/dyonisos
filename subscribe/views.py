@@ -11,6 +11,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.list import ListView
 
 from subscribe.models import Event, EventQuestion
@@ -164,9 +165,13 @@ def return_page(request, id):
         return event_message(request, subscription.event, _("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
+@csrf_exempt
 def webhook(request, id):
     # trigger checking
-    transaction_id = request.POST['id']
+    if request.method == "POST":
+        transaction_id = request.POST['id']
+    else:
+        transaction_id = request.GET['id']
 
     logger = logging.getLogger(__name__)
     logger.info('views::check() - id: %s, transaction id: %s' % (id, transaction_id))
