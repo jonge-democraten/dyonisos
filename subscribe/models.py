@@ -14,12 +14,16 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from django.conf import settings
 from django.db import models
 from django.template import Context, Template
+from django.utils import timezone
 from email.mime.text import MIMEText
 
 import datetime
+import json
 import logging
+import Mollie
 import smtplib
 
 
@@ -202,8 +206,6 @@ class Registration(models.Model):
     event = models.ForeignKey(Event, related_name='registrations')
     price = models.IntegerField(default=0)
     paid = models.BooleanField(default=False)
-    status = models.CharField(max_length=64, default="", blank=True)
-    trxid = models.CharField(max_length=128, default="", blank=True)
 
     def calculate_price(self):
         self.price = self.event.price + sum([answer.option.price for answer in self.answers.exclude(option=None)])
@@ -229,10 +231,16 @@ class Registration(models.Model):
     def __str__(self):
         return "%s %s - %s - %s" % (self.first_name, self.last_name, self.event, str(self.price))
 
-    def gen_subscription_id(self):
-        num_id = str(self.id)
-        safe = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-        return num_id + "x" + filter(lambda c: c in safe, self.get_options_name())[:15 - len(num_id)]
+    def update_payments(self):
+        if not self.paid:
+            totalpaid = 0
+            for payment in self.payments.all():
+                payment.update_from_mollie()
+                if payment.paid:
+                    totalpaid += payment.price
+            if totalpaid >= self.price:
+                self.paid = True
+                self.send_confirmation_email()
 
     def send_confirmation_email(self):
         t = Template(self.event.email_template)
@@ -300,3 +308,78 @@ class Answer(models.Model):
                 return self.bool_field and 'Ja' or 'Nee'
         elif self.question.question_type == "CHOICE":
             return self.option
+
+
+class Payment(models.Model):
+    trxid = models.CharField(max_length=128, blank=False, null=False)  # Transaction id from Mollie
+    description = models.CharField(max_length=255, blank=True)  # Description
+    price = models.IntegerField(default=0)  # Price in cents
+    url = models.CharField(max_length=254, blank=True)  # Receives the URL for the payment
+    time = models.DateTimeField(default=timezone.now)  # Time of creation of the payment
+    status = models.CharField(max_length=64, blank=True)  # Status from Mollie
+    paid = models.BooleanField(default=False)  # Whether the payment is paid or not
+    registration = models.ForeignKey(Registration, models.CASCADE, blank=True, null=True, related_name='payments')
+    data = models.TextField(blank=True)  # Contains JSON data
+
+    def __str__(self):
+        return "Payment '{}' of € {:.2f}".format(self.trxid, float(self.price) / 100.0)
+
+    @classmethod
+    def create(cls, price, description, redirectUrl, webhookUrl=None):
+        payment = cls(price=price, description=description)
+
+        try:
+            # Talk to Mollie
+            mollie = Mollie.API.Client()
+            mollie.setApiKey(settings.MOLLIE_KEY)
+
+            params = {'amount': float(price) / 100.0,
+                      'description': description,
+                      'redirectUrl': redirectUrl}
+            if webhookUrl is not None:
+                params['webhookUrl'] = webhookUrl
+
+            mpayment = mollie.payments.create(params)
+
+            # Store in model
+            payment.data = json.dumps(mpayment)  # mpayment is a dict
+            payment.trxid = mpayment["id"]
+            payment.url = mpayment.getPaymentUrl()
+            payment.status = mpayment["status"]
+            payment.paid = mpayment.isPaid()
+            payment.save()
+            return payment
+        except Mollie.API.Error as e:
+            logger = logging.getLogger(__name__)
+            logger.error("create: Mollie gave error " + e.message)
+            raise e
+
+    def on_paid(self):
+        if self.registration is not None:
+            self.registration.update_payments()
+
+    def update_from_mollie(self, force=False):
+        # Only check if our status is 'open' or 'pending'
+        if self.status not in ("", "open", "pending") and not force:
+            return
+        logger = logging.getLogger(__name__)
+        try:
+            waspaid = self.paid
+            # Load Mollie
+            mollie = Mollie.API.Client()
+            mollie.setApiKey(settings.MOLLIE_KEY)
+            # Get payment from Mollie
+            payment = mollie.payments.get(self.trxid)
+            # Update status
+            self.data = json.dumps(payment)  # mpayment is a dict
+            self.status = payment['status']
+            self.paid = payment.isPaid()
+            self.save()
+            # If it was not paid but it is now, trigger on_paid
+            if self.paid and not waspaid:
+                self.on_paid()
+        except Mollie.API.Error as e:
+            logger.error("update_from_mollie: Mollie gave error " + e.message)
+            raise e
+        else:
+            logger.info("update_from_mollie: Payment %s now has status '%s'" % (self.trxid, self.status))

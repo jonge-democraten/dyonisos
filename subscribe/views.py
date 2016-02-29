@@ -1,8 +1,6 @@
 import datetime
-import logging
 import Mollie
 
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -14,7 +12,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.list import ListView
 
-from subscribe.models import Event, EventQuestion
+from subscribe.models import Event, EventQuestion, Payment
 from subscribe.forms import Registration, SubscribeForm, fill_subscription
 
 
@@ -24,8 +22,6 @@ def event_message(request, event, message):
 
 
 def register(request, slug):
-    logger = logging.getLogger(__name__)
-
     # Get the event
     event = get_object_or_404(Event, slug=slug)
 
@@ -94,100 +90,58 @@ def register(request, slug):
 
     # Payment required...
     try:
-        mollie = Mollie.API.Client()
-        mollie.setApiKey(settings.MOLLIE_KEY)
-
-        # METADATA TOEVOEGEN
-        webhookUrl = request.build_absolute_uri(reverse("webhook", args=[subscription.id]))
-        redirectUrl = request.build_absolute_uri(reverse("return_page", args=[subscription.id])) 
-
-        payment = mollie.payments.create({
-            'amount': float(subscription.price) / 100.0,
-            'description': subscription.event.name,
-            'webhookUrl': webhookUrl,
-            'redirectUrl': redirectUrl,
-        })
-
-        subscription.trxid = payment["id"]
-        subscription.save()
-
-        return HttpResponseRedirect(payment.getPaymentUrl())
+        webhookUrl = request.build_absolute_uri(reverse("webhook"))
+        redirectUrl = request.build_absolute_uri(reverse("return_page", args=[subscription.id]))
+        payment = Payment.create(subscription.price, subscription.event.name, redirectUrl, webhookUrl)
+        payment.registration = subscription
+        payment.save()
+        return HttpResponseRedirect(payment.url)
     except Mollie.API.Error as e:
         error_str = "register: Technische fout, probeer later opnieuw.\n\n" + e.message
-        logger.error(error_str)
         return event_message(request, event, _(error_str))
-
-
-def check_transaction(subscription):
-    logger = logging.getLogger(__name__)
-    logger.info('check_transaction: Checking transaction %d with id %s' % (subscription.id, subscription.trxid))
-
-    mollie = Mollie.API.Client()
-    mollie.setApiKey(settings.MOLLIE_KEY)
-    payment = mollie.payments.get(subscription.trxid)
-
-    logger.info("check_transaction: Transaction %s has status %s" % (subscription.id, payment['status']))
-
-    subscription.status = payment['status']
-    subscription.paid = payment.isPaid()
-    subscription.save()
-    if subscription.paid:
-        subscription.send_confirmation_email()
 
 
 # called when the user returns from Mollie
 def return_page(request, id):
-    logger = logging.getLogger(__name__)
-    logger.info('views::return_page() - registration id: ' + str(id))
-
     # Retrieve the registration
     try:
         subscription = Registration.objects.get(id=id)
+        subscription.update_payments()
+    except Mollie.API.Error as e:
+        # Update payment information
+        error_str = "return_page: Technische fout, probeer later opnieuw." + "\n\n%s" % (e.message,)
+        return event_message(request, subscription.event, _(error_str))
     except:
         return HttpResponse(_("iDEAL error (onbekende inschrijving): Neem contact op met ict@jongedemocraten.nl. Controleer of uw betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
-    # If status unknown, then check it...
-    if subscription.status == "":
-        try:
-            check_transaction(subscription)
-        except Mollie.API.Error as e:
-            error_str = "return_page: Technische fout, probeer later opnieuw." + "\n\n%s" % (e.message,)
-            logger.error(error_str)
-            return event_message(request, subscription.event, _(error_str))
-
-    if subscription.status == "paid":
+    if subscription.paid:
         return event_message(request, subscription.event, _("Betaling geslaagd. Ter bevestiging is een e-mail verstuurd."))
-    elif subscription.status == "cancelled" or subscription.status == "expired":
-        return event_message(request, subscription.event, _("Je betaling is geannuleerd."))
-    elif subscription.status == "open" or subscription.status == "pending":
-        return event_message(request, subscription.event, _("Je betaling staat geregistreerd in ons systeem, maar wordt nog verwerkt door onze bank. Als je binnen een uur geen bevestigingsmail ontvangt, is er mogelijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
     else:
-        return event_message(request, subscription.event, _("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
+        # Assuming one Payment (temporarily)
+        payment = subscription.payments.first()
+        if payment.status == "cancelled" or payment.status == "expired":
+            return event_message(request, subscription.event, _("Je betaling is geannuleerd."))
+        elif payment.status == "open" or payment.status == "pending":
+            return event_message(request, subscription.event, _("Je betaling staat geregistreerd in ons systeem, maar wordt nog verwerkt door onze bank. Als je binnen een uur geen bevestigingsmail ontvangt, is er mogelijk iets fout gegaan met de betaling. Neem in dat geval contact op met ict@jongedemocraten.nl."))
+        else:
+            return event_message(request, subscription.event, _("Er is een fout opgetreden bij het verwerken van je iDEAL transactie. Neem contact op met ict@jongedemocraten.nl of probeer het later nogmaals. Controleer of je betaling is afgeschreven alvorens de betaling opnieuw uit te voeren."))
 
 
 @csrf_exempt
-def webhook(request, id):
-    # trigger checking
+def webhook(request):
+    # get transaction id from POST or GET
     if request.method == "POST":
         transaction_id = request.POST['id']
     else:
         transaction_id = request.GET['id']
 
-    logger = logging.getLogger(__name__)
-    logger.info('views::check() - id: %s, transaction id: %s' % (id, transaction_id))
-
+    # get payment and update
     try:
-        subscription = Registration.objects.get(id=id, trxid=transaction_id)
+        payment = Payment.objects.get(trxid=transaction_id)
+        payment.update_from_mollie(force=True)
+        return HttpResponse(_("OK"))
     except:
-        logger.error("views::check() - cannot find matching subscription")
         return HttpResponse(_("NOT OK"))
-
-    try:
-        check_transaction(subscription)
-    except Mollie.API.Error as e:
-        logger.error("webhook: error %s" % (e.message,))
-
-    return HttpResponse(_("OK"))
 
 
 @login_required

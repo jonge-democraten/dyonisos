@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from subscribe.models import Event, EventQuestion, EventOption, Answer, Registration
+from subscribe.models import Event, EventQuestion, EventOption, Answer, Registration, Payment
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -141,14 +141,26 @@ class AnswerInline(admin.TabularInline):
         return super(AnswerInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class PaymentInline(admin.TabularInline):
+    model = Payment
+    fields = ['trxid', 'price', 'status']
+    readonly_fields = ['trxid', 'price', 'status']
+    extra = 0
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class RegistrationAdmin(admin.ModelAdmin):
-    readonly_fields = ('registration_date', 'trxid')
-    list_display = ["id", "event", "first_name", "last_name", "status", "registration_date", "paid", "trxid", ]
+    readonly_fields = ('registration_date', )
+    list_display = ["id", "event", "first_name", "last_name", "registration_date", "paid", ]
     list_filter = ["paid", "event"]
     search_fields = ["first_name", "last_name"]
-    inlines = [AnswerInline]
+    inlines = [AnswerInline, PaymentInline]
 
 
 admin.site.register(EventQuestion, EventQuestionAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Registration, RegistrationAdmin)
+admin.site.register(Payment)
