@@ -14,14 +14,14 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-
 from django.db import models
 from django.template import Context, Template
+from email.mime.text import MIMEText
 
 import datetime
-import smtplib
 import logging
-from email.mime.text import MIMEText
+import smtplib
+
 
 logger = logging.getLogger(__name__)
 
