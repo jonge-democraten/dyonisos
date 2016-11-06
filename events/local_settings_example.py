@@ -30,6 +30,7 @@ STATIC_URL = '/static/'
 # JANEUS_SERVER = "ldap://127.0.0.1:389/"
 # JANEUS_DN = "cn=readuser, ou=sysUsers, dc=jd, dc=nl"
 # JANEUS_PASS = ""
+# def JANEUS_CURRENT_SITE(): return 1
 # AUTHENTICATION_BACKENDS = ('janeus.backend.JaneusBackend', 'django.contrib.auth.backends.ModelBackend',)
 
 # Key for Mollie
