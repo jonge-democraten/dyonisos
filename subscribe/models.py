@@ -34,7 +34,7 @@ AFDELINGEN = (
     ("LH", "Leiden-Haaglanden"),
     ("MS", "Limburg"),
     ("RD", "Rotterdam"),
-    ("TW", "Twente"),
+    ("TW", "Overijssel"),
     ("UT", "Utrecht"),
     ("INT", "Internationaal"),
 )
