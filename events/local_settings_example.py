@@ -25,6 +25,14 @@ ALLOWED_HOSTS = []
 # STATIC_ROOT = '/usr/share/events/static/'
 STATIC_URL = '/static/'
 
+# EMAIL
+EMAIL_HOST = ''
+EMAIL_PORT = '587'
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = ''
+
 # Janeus settings
 # Uncomment if you have an LDAP server
 # JANEUS_SERVER = "ldap://127.0.0.1:389/"

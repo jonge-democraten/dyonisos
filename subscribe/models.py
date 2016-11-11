@@ -14,14 +14,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+import datetime
+import logging
+import traceback
 
+from django.core.mail import EmailMessage
 from django.db import models
 from django.template import Context, Template
-
-import datetime
-import smtplib
-import logging
-from email.mime.text import MIMEText
 
 logger = logging.getLogger(__name__)
 
@@ -241,20 +240,19 @@ class Registration(models.Model):
             "achternaam": self.last_name,
             "inschrijf_opties": self.get_options_text(),
         })
-        # XXX: Financiele info
-        rendered_mail = t.render(c).encode('utf-8')
-        msg = MIMEText(rendered_mail, 'plain', 'utf-8')
-        msg.set_charset("utf-8")
-        msg["Subject"] = "Inschrijfbevestiging: %s" % (self.event.name)
-        msg["From"] = self.event.contact_email
-        msg["To"] = self.email
-        # Send msg
+        rendered_mail = t.render(c)
+        email = EmailMessage(
+            subject="Inschrijfbevestiging: %s" % (self.event.name),
+            body=rendered_mail,
+            from_email=self.event.contact_email,
+            to=[self.email],
+        )
         try:
-            s = smtplib.SMTP("localhost:587")
-            s.sendmail(self.event.contact_email, [self.email], msg.as_string())
-            s.quit()
+            email.send()
         except:
             logger.error("Could not send welcome mail to %s" % (self.email))
+            logger.error(traceback.format_exc())
+            raise
         return rendered_mail
 
 
