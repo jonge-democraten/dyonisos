@@ -137,7 +137,7 @@ LOGGING = {
         'logfile': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': "logfile",
+            'filename': "dyonisos.log",
             'maxBytes': 5000000,
             'backupCount': 2,
             'formatter': 'standard',
@@ -150,7 +150,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers':['console'],
+            'handlers':['console', 'logfile'],
             'propagate': True,
             'level':'WARN',
         },
