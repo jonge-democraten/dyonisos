@@ -4,7 +4,7 @@ import Mollie
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
