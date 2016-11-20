@@ -99,7 +99,7 @@ def register(request, slug):
 
         # METADATA TOEVOEGEN
         webhookUrl = request.build_absolute_uri(reverse("webhook", args=[subscription.id]))
-        redirectUrl = request.build_absolute_uri(reverse("return_page", args=[subscription.id])) 
+        redirectUrl = request.build_absolute_uri(reverse("return_page", args=[subscription.id]))
 
         payment = mollie.payments.create({
             'amount': float(subscription.price) / 100.0,
@@ -129,7 +129,7 @@ def check_transaction(subscription):
     logger.info("check_transaction: Transaction %s has status %s" % (subscription.id, payment['status']))
 
     subscription.status = payment['status']
-    subscription.paid = payment.isPaid()
+    subscription.paid = payment.isPaid() != ''  # note: isPaid() returns a date
     subscription.save()
     if subscription.paid:
         subscription.send_confirmation_email()
