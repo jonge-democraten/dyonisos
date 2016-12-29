@@ -263,7 +263,7 @@ class Answer(models.Model):
     int_field = models.IntegerField(default=0, null=True)
     txt_field = models.CharField(max_length=256, blank=True)
     bool_field = models.BooleanField(default=False)
-    option = models.ForeignKey(EventOption, default=None, null=True)
+    option = models.ForeignKey(EventOption, default=None, null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.question, self.get_answer())
