@@ -1,0 +1,211 @@
+[
+{
+  "model": "subscribe.event",
+  "pk": 1,
+  "fields": {
+    "name": "Free Test Event",
+    "slug": "free-test-event",
+    "start_registration": "2017-01-01T14:01:02",
+    "end_registration": "2020-01-30T20:01:02",
+    "description": "This is a test event.",
+    "contact_email": "test@test.nl",
+    "email_template": "Dear {{ voornaam }} {{ achternaam }},\r\n\r\nYou have successfully subscribed to this free event with the following options,\r\n\r\n{{ inschrijf_opties }}\r\n\r\nBest regards,\r\nJonge Democraat",
+    "price": 0,
+    "max_registrations": 0
+  }
+},
+{
+  "model": "subscribe.eventquestion",
+  "pk": 1,
+  "fields": {
+    "event": 1,
+    "name": "Name",
+    "question_type": "TXT",
+    "required": false,
+    "radio": false,
+    "order": 0,
+    "text": ""
+  }
+},
+{
+  "model": "subscribe.eventquestion",
+  "pk": 2,
+  "fields": {
+    "event": 1,
+    "name": "Age",
+    "question_type": "INT",
+    "required": false,
+    "radio": false,
+    "order": 0,
+    "text": ""
+  }
+},
+{
+  "model": "subscribe.eventquestion",
+  "pk": 3,
+  "fields": {
+    "event": 1,
+    "name": "Department",
+    "question_type": "AFD",
+    "required": false,
+    "radio": false,
+    "order": 0,
+    "text": ""
+  }
+},
+{
+  "model": "subscribe.eventquestion",
+  "pk": 4,
+  "fields": {
+    "event": 1,
+    "name": "Vegetarian",
+    "question_type": "BOOL",
+    "required": false,
+    "radio": false,
+    "order": 0,
+    "text": ""
+  }
+},
+{
+  "model": "subscribe.eventquestion",
+  "pk": 5,
+  "fields": {
+    "event": 1,
+    "name": "Size",
+    "question_type": "CHOICE",
+    "required": false,
+    "radio": false,
+    "order": 0,
+    "text": ""
+  }
+},
+{
+  "model": "subscribe.eventoption",
+  "pk": 1,
+  "fields": {
+    "question": 5,
+    "name": "S",
+    "price": 0,
+    "active": true,
+    "order": 0,
+    "limit": 0
+  }
+},
+{
+  "model": "subscribe.eventoption",
+  "pk": 2,
+  "fields": {
+    "question": 5,
+    "name": "M",
+    "price": 0,
+    "active": true,
+    "order": 0,
+    "limit": 0
+  }
+},
+{
+  "model": "subscribe.eventoption",
+  "pk": 3,
+  "fields": {
+    "question": 5,
+    "name": "L",
+    "price": 0,
+    "active": true,
+    "order": 0,
+    "limit": 0
+  }
+},
+{
+  "model": "subscribe.registration",
+  "pk": 1,
+  "fields": {
+    "registration_date": "2017-01-15T17:50:23.216",
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john@doe.com",
+    "event": 1,
+    "price": 0,
+    "paid": false,
+    "status": "",
+    "trxid": ""
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 1,
+  "fields": {
+    "registration": 1,
+    "question": 1,
+    "int_field": 0,
+    "txt_field": "John Doe",
+    "bool_field": false,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 2,
+  "fields": {
+    "registration": 1,
+    "question": 2,
+    "int_field": 20,
+    "txt_field": "",
+    "bool_field": false,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 3,
+  "fields": {
+    "registration": 1,
+    "question": 3,
+    "int_field": 0,
+    "txt_field": "UT",
+    "bool_field": false,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 4,
+  "fields": {
+    "registration": 1,
+    "question": 4,
+    "int_field": 0,
+    "txt_field": "",
+    "bool_field": true,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 5,
+  "fields": {
+    "registration": 1,
+    "question": 5,
+    "int_field": 0,
+    "txt_field": "",
+    "bool_field": false,
+    "option": 2
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$30000$AYvh60nEMeFk$AiEBbuV9EWbKZZmNwoJ5sGYrDP+5SPwh5iZiZAWG7YI=",
+    "last_login": "2017-01-15T13:11:18.162",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "test@test.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2017-01-15T13:09:19.146",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

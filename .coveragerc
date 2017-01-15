@@ -1,0 +1,6 @@
+[run]
+source = subscribe
+
+[report]
+omit =
+    */migrations/*

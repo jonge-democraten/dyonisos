@@ -1,0 +1,16 @@
+sudo: false
+language: python
+python:
+  - "3.4"
+# command to install dependencies
+install:
+  - "pip install -r requirements.txt"
+  - "python create_local_settings.py"
+  - "pip install coveralls"
+# command to run tests
+script:
+  - "coverage run manage.py test"
+notifications:
+  email: false
+after_success:
+  coveralls
