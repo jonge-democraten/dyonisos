@@ -227,4 +227,4 @@ class HomeView(ListView):
         if not request.user.is_staff:
             now = datetime.datetime.now()
             self.queryset = self.queryset.filter(start_registration__lte=now, end_registration__gte=now)
-        return super(HomeView, self).get(self, request, *args, **kwargs)
+        return super().get(self, request, *args, **kwargs)

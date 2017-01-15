@@ -32,7 +32,7 @@ setattr(forms.fields.Field, 'is_checkbox', lambda self: isinstance(self.widget, 
 class RadioChoiceInputDisabled(forms.widgets.RadioChoiceInput):
     def __init__(self, *args, **kwargs):
         disabledset = kwargs.pop('disabledset', None)
-        super(RadioChoiceInputDisabled, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.disabledset = set([str(x.pk) for x in disabledset])
         if self.choice_value in self.disabledset:
             self.attrs['disabled'] = 'disabled'
@@ -51,7 +51,7 @@ class RadioSelectDisabled(forms.widgets.RadioSelect):
             instance.disabledset = self.disabledset
             return instance
         else:
-            return super(RadioSelectDisabled, self).renderer(*args, **kwargs)
+            return super().renderer(*args, **kwargs)
 
 
 class SelectDisabled(forms.widgets.Select):
@@ -88,7 +88,7 @@ class SubscribeForm(forms.Form):
 
         kwargs['label_suffix'] = ''
 
-        super(SubscribeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.event = event
 
@@ -170,13 +170,13 @@ class SubscribeForm(forms.Form):
             self._elements += [('field', 'email')]
 
     def is_valid(self):
-        res = super(SubscribeForm, self).is_valid()
+        res = super().is_valid()
         if not res:
             return False
         if self.preview:
             self.confirm_page()
             self.full_clean()
-            res = super(SubscribeForm, self).is_valid()
+            res = super().is_valid()
         return res
 
     def confirm_page(self):
