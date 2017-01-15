@@ -27,6 +27,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'subscribe', # the main app
+    'janeus', # access control via JD LDAP
+    'events',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,8 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
-    'subscribe', # the main app
-    'janeus', # access control via JD LDAP
+
 )
 
 MIDDLEWARE_CLASSES = [
