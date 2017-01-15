@@ -1,4 +1,4 @@
-[![Dependency Status](https://gemnasium.com/jonge-democraten/dyonisos.svg)](https://gemnasium.com/jonge-democraten/dyonisos) 
+[![Build Status](https://travis-ci.org/jonge-democraten/dyonisos.svg?branch=master)](https://travis-ci.org/jonge-democraten/dyonisos) [![Coverage Status](https://coveralls.io/repos/github/jonge-democraten/dyonisos/badge.svg?branch=tests)](https://coveralls.io/github/jonge-democraten/dyonisos?branch=tests) [![Dependency Status](https://gemnasium.com/jonge-democraten/dyonisos.svg)](https://gemnasium.com/jonge-democraten/dyonisos) 
 About
 =====
 Dyonisos is a Django based web application that was developed for the
