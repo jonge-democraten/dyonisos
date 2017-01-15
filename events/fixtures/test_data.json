@@ -116,6 +116,81 @@
   }
 },
 {
+  "model": "subscribe.registration",
+  "pk": 1,
+  "fields": {
+    "registration_date": "2017-01-15T17:50:23.216",
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john@doe.com",
+    "event": 1,
+    "price": 0,
+    "paid": false,
+    "status": "",
+    "trxid": ""
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 1,
+  "fields": {
+    "registration": 1,
+    "question": 1,
+    "int_field": 0,
+    "txt_field": "John Doe",
+    "bool_field": false,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 2,
+  "fields": {
+    "registration": 1,
+    "question": 2,
+    "int_field": 20,
+    "txt_field": "",
+    "bool_field": false,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 3,
+  "fields": {
+    "registration": 1,
+    "question": 3,
+    "int_field": 0,
+    "txt_field": "UT",
+    "bool_field": false,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 4,
+  "fields": {
+    "registration": 1,
+    "question": 4,
+    "int_field": 0,
+    "txt_field": "",
+    "bool_field": true,
+    "option": null
+  }
+},
+{
+  "model": "subscribe.answer",
+  "pk": 5,
+  "fields": {
+    "registration": 1,
+    "question": 5,
+    "int_field": 0,
+    "txt_field": "",
+    "bool_field": false,
+    "option": 2
+  }
+},
+{
   "model": "auth.user",
   "pk": 1,
   "fields": {
