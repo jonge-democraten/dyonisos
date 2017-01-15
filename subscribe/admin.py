@@ -133,12 +133,12 @@ class AnswerInline(admin.TabularInline):
 
     def get_formset(self, request, obj=None, **kwargs):
         self.parent_obj = obj
-        return super(AnswerInline, self).get_formset(request, obj, **kwargs)
+        return super().get_formset(request, obj, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "option":
             kwargs['queryset'] = db_field.rel.to.objects.filter(question__event=self.parent_obj.event)
-        return super(AnswerInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class RegistrationAdmin(admin.ModelAdmin):
