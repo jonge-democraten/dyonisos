@@ -27,7 +27,12 @@ On Ubuntu, the following packages need to be installed before running `build_env
 Development
 ===========
 
-### Create test data,
+### Run tests
+```bash
+$ python manage.py test
+```
+
+### Create test data
 ```bash
 $ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group subscribe > events/fixtures/test_data.json 
 ```
