@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/jonge-democraten/dyonisos.svg?branch=master)](https://travis-ci.org/jonge-democraten/dyonisos) [![Coverage Status](https://coveralls.io/repos/github/jonge-democraten/dyonisos/badge.svg?branch=tests)](https://coveralls.io/github/jonge-democraten/dyonisos?branch=tests) [![Dependency Status](https://gemnasium.com/jonge-democraten/dyonisos.svg)](https://gemnasium.com/jonge-democraten/dyonisos) 
-About
-=====
+# dyonisos
+[![Build Status](https://travis-ci.org/jonge-democraten/dyonisos.svg?branch=master)](https://travis-ci.org/jonge-democraten/dyonisos) [![Coverage Status](https://coveralls.io/repos/github/jonge-democraten/dyonisos/badge.svg?branch=tests)](https://coveralls.io/github/jonge-democraten/dyonisos?branch=tests) [![Dependency Status](https://gemnasium.com/jonge-democraten/dyonisos.svg)](https://gemnasium.com/jonge-democraten/dyonisos)  
+
 Dyonisos is a Django based web application that was developed for the
 Jonge Democraten. The JD organized events with some regularity where
 guests have to subscribe and sometimes pay for entry. This is what
