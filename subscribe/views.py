@@ -118,18 +118,6 @@ def register(request, slug):
         return event_message(request, event, _(error_str))
 
 
-def is_paid(mollie_payment):
-    """
-    This somewhat strange function is needed because of a Mollie API 'issue':
-    https://github.com/mollie/mollie-api-python/issues/18
-    NOTE: Payment.isPaid() returns a date, empty string or False
-    TODO: remove if https://github.com/mollie/mollie-api-python/issues/18 is fixed
-    """
-    if mollie_payment.isPaid():
-        return True
-    return False
-
-
 def check_transaction(subscription):
     logger = logging.getLogger(__name__)
     logger.info('check_transaction: Checking transaction %d with id %s' % (subscription.id, subscription.trxid))
@@ -141,7 +129,7 @@ def check_transaction(subscription):
     logger.info("check_transaction: Transaction %s has status %s" % (subscription.id, payment['status']))
 
     subscription.status = payment['status']
-    subscription.paid = is_paid(payment)
+    subscription.paid = payment.isPaid()
     subscription.save()
     if subscription.paid:
         subscription.send_confirmation_email()
