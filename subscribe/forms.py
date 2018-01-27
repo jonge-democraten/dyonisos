@@ -222,6 +222,13 @@ class SubscribeForm(forms.Form):
                 res += [(element_type, self[element_value])]
         return res
 
+    @property
+    def is_free_event(self):
+        if not self.event:
+            return False
+        if self.event.price == 0:
+            return True
+        return False
 
 @transaction.atomic
 def fill_subscription(form, event):

@@ -53,7 +53,7 @@ def register(request, slug):
         return render_to_response("subscribe/form.html", c)
 
     # It is a POST request, and the form is valid, check if this is the confirmation page
-    if 'registration_preview' not in request.POST:
+    if 'registration_preview' not in request.POST and not form.is_free_event:
         form.confirm_page()
         c = {"event": event, "request": request, "form": form, "user_is_staff": request.user.is_staff}
         c.update(csrf(request))
@@ -113,7 +113,7 @@ def register(request, slug):
 
         return HttpResponseRedirect(payment.getPaymentUrl())
     except Mollie.API.Error as e:
-        error_str = "register: Technische fout, probeer later opnieuw.\n\n" + e.message
+        error_str = "register: Technische fout, probeer later opnieuw.\n\n" + str(e)
         logger.error(error_str)
         return event_message(request, event, _(error_str))
 
@@ -163,7 +163,7 @@ def return_page(request, id):
         try:
             check_transaction(subscription)
         except Mollie.API.Error as e:
-            error_str = "return_page: Technische fout, probeer later opnieuw." + "\n\n%s" % (e.message,)
+            error_str = "return_page: Technische fout, probeer later opnieuw." + "\n\n%s" % (str(e),)
             logger.error(error_str)
             return event_message(request, subscription.event, _(error_str))
 
@@ -197,7 +197,7 @@ def webhook(request, id):
     try:
         check_transaction(subscription)
     except Mollie.API.Error as e:
-        logger.error("webhook: error %s" % (e.message,))
+        logger.error("webhook: error %s" % (str(e),))
 
     return HttpResponse(_("OK"))
 

@@ -24,8 +24,13 @@
   {% endwith %}
 {% endif %}
 {% endfor %}
+
 {% if not form.preview %}
-<div class='submit'><input class="button" type="submit" value="Doorgaan!" onclick="this.disabled=true,this.form.submit()" /></div>
+<div class='submit'>
+  <input class="button" type="submit"
+         value="{% if form.is_free_event %}Registreer!{% else %}Doorgaan!{% endif %}"
+         onclick="this.disabled=true,this.form.submit()"/>
+</div>
 {% endif %}
 </div>
 {% endif %}
