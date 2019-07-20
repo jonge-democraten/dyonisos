@@ -35,6 +35,7 @@ AFDELINGEN = (
     ("RD", "Rotterdam"),
     ("TW", "Overijssel"),
     ("UT", "Utrecht"),
+    ("WN", "Wageningen"),
     ("INT", "Internationaal"),
 )
 
