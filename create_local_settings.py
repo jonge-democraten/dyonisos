@@ -14,7 +14,7 @@ LOCAL_SETTINGS_EXAMPLE_PATH = './events/local_settings_example.py'
 def main():
     if os.path.exists(LOCAL_SETTINGS_PATH):
         print('ERROR: ' + LOCAL_SETTINGS_PATH +
-              ' already exists! Please remove this file manually if you intent to overwrite it.')
+              ' already exists! Please remove this file manually if you intend to overwrite it.')
         return
     shutil.copyfile(LOCAL_SETTINGS_EXAMPLE_PATH, LOCAL_SETTINGS_PATH)
     secret_key_random = generate_random_secret_key()
